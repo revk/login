@@ -12,7 +12,7 @@ The effect of this is to put all form posted fields in environment variables (wi
 
 The easiest way to understand this is try it, printing the environment when you send various types of form data, but mostly it is pretty obvious.
 
-`envcgi` and related tools set a session tracking cookie used to manage login.
+`envcgi` and related tools set a session tracking cookie used to manage login. Whilst a session cookie is normally used, it is possible to also allow http authentication if the header is configured in apache, and so allow per page access login with correct password (e.g. to use with curl).
 
 ## Logged in wrapper
 
