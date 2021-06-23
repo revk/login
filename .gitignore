@@ -1,0 +1,11 @@
+sdkconfig
+.config
+config.h
+*.o
+envcgi
+login
+logout
+loggedin
+logincheck
+password
+changepassword
