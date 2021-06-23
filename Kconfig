@@ -202,7 +202,7 @@ menu "Environment"
 	default "FORM_SECURITY_NAME"
 	depends on FORM_SECURITY
 	help
-		Use the content of this variable as the name for a hidden field in any form you make.
+		Use the content of this variable as the name for a hidden field in any form you make. Holds FORM_SECURITY_NAME
 
     config ENV_FORM_SECURITY_OK
     	string "Environment variable that is only set if the form security passed"
@@ -213,10 +213,10 @@ menu "Environment"
 
     config ENV_FORM_SECURITY_VALUE
     	string "Environment variable holding the field value to use for form security"
-	default "FORM_SECURITY_VALUE"
+	default ""
 	depends on FORM_SECURITY
 	help
-		Use the content of this variable as the value for a hidden field in any form you make.
+		Use the content of this variable as the value for a hidden field in any form you make - default is FORM_SECURITY_NAME
 
     config ENV_RELAY_ADDR
     	string "Environment variable set if relayed via proxy"

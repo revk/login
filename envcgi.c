@@ -199,9 +199,13 @@ void form_security(void)
       }
       b64[o] = 0;
    }
-   const char *form = getenv(CONFIG_FORM_SECURITY_TAG);
+   const char *form = NULL;
+   if (*CONFIG_FORM_SECURITY_TAG)
+      form = getenv(CONFIG_FORM_SECURITY_TAG);
    if (*CONFIG_ENV_FORM_SECURITY_VALUE)
       setenv(CONFIG_ENV_FORM_SECURITY_VALUE, b64, 1);
+   else if (*CONFIG_FORM_SECURITY_TAG)
+      setenv(CONFIG_FORM_SECURITY_TAG, b64, 1);
    if (*CONFIG_ENV_FORM_SECURITY_NAME && *CONFIG_FORM_SECURITY_TAG)
       setenv(CONFIG_ENV_FORM_SECURITY_NAME, CONFIG_FORM_SECURITY_TAG, 1);
    if (form)
