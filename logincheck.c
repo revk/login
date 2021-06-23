@@ -29,5 +29,5 @@ const char * logincheck(const char *session)
 
 
    sql_close(&sql);
-   return "TODO";
+   return NULL; // OK
 }

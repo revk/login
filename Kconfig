@@ -323,5 +323,11 @@ menu "Passwords"
 	help
 		Accept the very insure very old mysql password hashes
 
+    config PASSWORD_DELAY
+    	bool "Delay for failed password - system wide lockout"
+	default y
+	help
+		System wide delay on password fail
+
 endmenu
 
