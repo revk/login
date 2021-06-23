@@ -40,11 +40,11 @@ There are also tools that the scripts can use.
 
 ## Passwords
 
-The system stores passwords in a hash, usually in a `text` field called `pass` in a database. The system understands a number of password hash formats including mysql `password()` hashs. The exact supported hashes is configurable. When a user logs in correctly the password is updated if necessary to the latest password format used - currently `argon2`. This helps ensure you are using current best practice passwords.
+The system stores passwords in a hash, usually in a `text` field called `pass` in a database. The system understands a number of password hash formats including mysql `password()` hashs. The supported hashes are configurable. When a user logs in correctly the password is updated if necessary to the latest password format used - currently `argon2`. This helps ensure you are using current best practice password hashes.
 
 ## OTP
 
-One time passwords may be added later, but at present the system works only on passwords.
+One time passwords may be added later, but at present the system works only on passwords. This will be a configurable feature, for backwards compatibility.
 
 ## Database
 
