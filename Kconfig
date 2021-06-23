@@ -12,12 +12,83 @@ menu "Database"
 	help
 		If database name is expected from an environment variable
 
-    config DB_DB
+    config DB_DATABASE
     	string "Database name"
 	default ""
 	depends on !DB_FROM_ENV
 	help
 		Fixed database name to use (may be in mysql.conf if not set here)
+
+    config DB_USER_TABLE
+    	string "User table"
+	default "user"
+	help
+		Table for user ID and password
+
+    config DB_USER_FIELD
+    	string "User login field"
+	default "user"
+	help
+		The field name in user table for the user login name/email/etc
+
+    config DB_PASS_FIELD
+    	string "User password field"
+	default "pass"
+	help
+		The field name in user table for the password hash
+
+    config DB_LAST_LOGIN_FIELD
+    	string "User lastlogin field"
+	default ""
+	help
+		The field name in user table for the last time logged in
+
+    config DB_SEPARATE_SESSION
+    	bool "Separate session table"
+	default y
+	help
+		If a separate session table is to be used
+
+    config DB_SESSION_TABLE
+    	string "Session table"
+	default "session"
+	depends on DB_SEPARATE_SESSION
+	help
+		Table for session tracking
+
+    config DB_SESSION_FIELD
+    	string "Session cookie field"
+	default "session"
+	help
+		Field name for session tracking cookie
+
+    config DB_SESSION_USER_LINK
+    	string "Field name in session table to link to user"
+	default "user"
+	depends on DB_SEPARATE_SESSION
+	help
+		Field name, probably foreign key, from session table to user
+
+    config DB_USER_KEY_FIELD
+    	string "Field name in user table that is primary key linked from session table"
+	default "ID"
+	depends on DB_SEPARATE_SESSION
+	help
+		Field name of primary key in user table linked from session table
+
+    config DB_SESSION_TIME
+    	string "Field name in session table for logged in time"
+	default "logintime"
+	depends on DB_SEPARATE_SESSION
+	help
+		Field name for logged in time
+
+    config DB_SESSION_IP
+    	string "Field name in session table for logged in IP"
+	default "IP"
+	depends on DB_SEPARATE_SESSION
+	help
+		Field name for logged in IP address varchar(39) - updated if it changes...
 
 endmenu
 
@@ -28,6 +99,12 @@ menu "CGI Wrapper"
 	default "ENVCGI"
 	help
 		Name of session cookie
+
+    config SESSION_EXPIRY
+    	int "Session expiry (hours)"
+	default 24
+	help
+		Session expiry (hours), set 0 for unlimited
 
     config PAGE_LOGIN
 	string "Login"
@@ -41,7 +118,6 @@ menu "CGI Wrapper"
 	depends on DB_FROM_ENV
 	help
 		Sets the database environment variable based on the first part of url, e.g. https://example.com/from/stuff.cgi sets to from
-
 endmenu
 
 menu "Environment"
@@ -64,6 +140,7 @@ menu "Environment"
 	default "BACK"
 	help
 		Environment variable included when redirecting to login page to allow return to requested page (if was a GET)
+
 endmenu
 
 menu "Passwords"

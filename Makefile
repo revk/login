@@ -1,4 +1,4 @@
-all:	login logout password loggedin logincheck envcgi changepassword
+all:	password envcgi login logout loggedin logincheck changepassword
 
 ifneq ($(wildcard /usr/bin/mysql_config),)
 SQLINC=$(shell mysql_config --include)
@@ -33,7 +33,7 @@ menuconfig:
 	kconfig-mconf Kconfig
 	touch .config
 
-.config: Kconfig Makefile
+.config: Kconfig
 	kconfig-mconf Kconfig
 	touch .config
 

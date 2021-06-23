@@ -18,10 +18,6 @@
 #include "xkcd936-wordlist.h"
 
 #define	RANDOM	"/dev/urandom"
-static const char BASE32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-#ifndef LIB
-static const char BASE16[] = "0123456789ABCDEF";
-#endif
 
 // Password generation system - creates malloc'd password
 // Password is between min and max in length and at least
