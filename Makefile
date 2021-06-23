@@ -14,23 +14,25 @@ endif
 COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC}
 LINKFLAGS=${CCFLAGS} ${SQLLIB} -lcrypto -lssl
 
-envcgi: envcgi.o errorwrap.o
+envcgi: envcgi.c envcgi.o errorwrap.o
 	gcc -o $@ $< ${LINKFLAGS} errorwrap.o
 
 envcgi.o: envcgi.c envcgi.h config.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-password: password.o
-	gcc -o $@ $< ${LINKFLAGS}
+password: password.c password.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt
 
-password.o: password.c password.h config.h
+password.o: password.c password.h config.h xkcd936-wordlist.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 menuconfig:
 	kconfig-mconf Kconfig
+	touch .config
 
 .config: Kconfig Makefile
 	kconfig-mconf Kconfig
+	touch .config
 
 config.h: .config
 	sed -e '/^$$/d' -e '/#.*/d' -e 's/^/#define /' -e 's/=/ /' $< > $@
