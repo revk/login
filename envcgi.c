@@ -50,26 +50,27 @@ int peek = 0;
 int PLUGIN(const char *);
 #endif
 
-void make_uuid(char uuid[UUID_LEN + 1])
-{
-   *uuid = 0;
+char * make_uuid(void)
+{ // malloc'd random uuid
    int f = open("/dev/urandom", O_RDONLY);
    if (f < 0)
    {
       warn("Random open failed");
-      return;
+      return NULL;
    }
    unsigned char v[16];
    if (read(f, &v, sizeof(v)) != sizeof(v))
    {
       close(f);
       warn("Random read failed");
-      return;
+      return NULL;
    }
    v[6] = 0x40 | (v[6] & 0x0F); // Version 4: Random
    v[8] = 0x80 | (v[8] & 0x3F); // Variant 1
-   snprintf(uuid, UUID_LEN + 1, "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]);
+	char *uuid=NULL;
+   if(asprintf(&uuid, "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15])<0)errx(1,"malloc");
    close(f);
+   return uuid;
 }
 
 
@@ -756,48 +757,10 @@ int main(int argc, char *argv[])
 
    if (*CONFIG_SESSION_COOKIE)
    {
-      session = malloc(UUID_LEN + 1);
-      if (!session)
-         errx(1, "malloc");
-      // Get session cookie, and update
-      const int len = sizeof(CONFIG_SESSION_COOKIE) - 1;
-      const char *cookie = getenv("HTTP_COOKIE");
-      if (cookie)
-      {                         // Look for one
-         while (*cookie)
-         {
-            if (!strncmp(cookie, CONFIG_SESSION_COOKIE, len))
-            {
-               cookie += len;
-               while (*cookie == ' ' || *cookie == '\t')
-                  cookie++;
-               if (*cookie == '=')
-               {
-                  cookie++;
-                  while (*cookie == ' ' || *cookie == '\t')
-                     cookie++;
-                  const char *v = cookie;
-                  while ((*cookie >= 'A' && *cookie <= 'Z') || (*cookie >= '0' && *cookie <= '9') || *cookie == '-')
-                     cookie++;
-                  if ((cookie - v) == UUID_LEN)
-                  {             // Found
-                     memmove(session, v, UUID_LEN);
-                     session[UUID_LEN] = 0;
-                     break;
-                  }
-               }
-            }
-            while (*cookie && *cookie != ';')
-               cookie++;
-            if (*cookie == ';')
-               cookie++;
-            while (*cookie == ' ' || *cookie == '\t')
-               cookie++;
-         }
-      }
+	   session=getenv("COOKIE_"CONFIG_SESSION_COOKIE);
       if (!*session)
       {                         // Allocate a cookie
-         make_uuid(session);
+         session=make_uuid();
          if (!CONFIG_SESSION_EXPIRY)
             printf("Set-Cookie: %s=%s; Path=/; HTTPOnly;%s\r\n", CONFIG_SESSION_COOKIE, session, getenv("HTTPS") ? " Secure" : "");     // Only needs setting once
       }
