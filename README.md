@@ -1,6 +1,6 @@
 # login
 
-This is a generic couple of tools that allow web CGI scripts to work with a login (managed by sql back end).
+This is a generic set of tools that allow web CGI scripts to work with a login (managed by sql back end).
 
 The tool has to cater for a lot of possible usage scenarios, and so uses Kconfig (make menuconfig) to define the environment for usage. This then makes the individual tools very simple as they do not need a myriad of options.
 
