@@ -1,1 +1,1 @@
-int logincheck(const char *session);
+const char* logincheck(const char *session);

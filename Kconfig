@@ -105,11 +105,17 @@ menu "CGI Wrapper"
 	help
 		Session expiry (hours), set 0 for unlimited
 
+    config PAGE_HOME
+	string "Login"
+	default "/"
+	help
+		Home page to which user is redirected when logged in (if not back link)
+
     config PAGE_LOGIN
 	string "Login"
 	default "/login.cgi"
 	help
-		Login page to which user is redirected
+		Login page to which user is redirected when not logged in
 
     config ENV_DB_FROM_URL
     	bool "Set database environment variable from first part of URL"
@@ -139,7 +145,7 @@ menu "CGI Wrapper"
 
     config CGI_PATH
     	string "Fixed path under which to run CGI, colon separated"
-	default "/projects/tools/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/mysql/bin"
+	default "../login:../login/SQLlib:/usr/local/bin:/bin:/usr/bin:/usr/local/mysql/bin"
 	help
 		Force a specific PATH for CGI scripts
 
@@ -149,7 +155,7 @@ menu "Environment"
 
     config ENV_DB
     	string "Database environment variable"
-	default ""
+	default "DB"
 	depends on DB_FROM_ENV
 	help
 		Name of database environment variable
@@ -166,11 +172,29 @@ menu "Environment"
 	help
 		Users unique ID from user table for logged in user
 
+    config ENV_USERNAME
+    	string "The environment variable for username when logging in"
+	default "USERNAME"
+	help
+		Field name to use in a form for username in login
+
+    config ENV_PASSWORD
+    	string "The environment variable for password when logging in"
+	default "PASSWORD"
+	help
+		Field name to use in a form for password in login
+
     config ENV_BACK
 	string "Back link environment variable"
 	default "BACK"
 	help
-		Environment variable included when redirecting to login page to allow return to requested page (if was a GET)
+		Form variable included when redirecting to login page to allow return to requested page (if was a GET)
+
+    config ENV_FAIL
+	string "Fail link environment variable"
+	default "FAIL"
+	help
+		Form variable included when redirecting to login page to show an error on the page
 
     config ENV_SECURITY
     	string "Environment / form field name used for checking form security"

@@ -38,8 +38,8 @@ logincheck: envcgi.c logincheck.o
 logincheck.o: logincheck.c config.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-login: login.c login.o
-	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+login: login.c login.o envcgi.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o envcgi.o
 
 login.o: login.c login.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

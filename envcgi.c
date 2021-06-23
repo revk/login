@@ -47,8 +47,54 @@ char post = 0;
 int peek = 0;
 
 #ifdef PLUGIN
-int PLUGIN(const char *);
+const char* PLUGIN(const char *);
 #endif
+
+void sendredirect(const char *page,const char *fail)
+{
+   const char *v;
+   printf("Location: ");
+   if (*CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
+      printf("%s", v);
+#ifdef  CONFIG_ENV_DB_FROM_URL
+   if (*CONFIG_ENV_DB && (v = getenv(CONFIG_ENV_DB)) && *v)
+      printf("%s/", v);
+#endif
+   const char *back = NULL;
+   if (*CONFIG_ENV_BACK)
+      back = getenv(CONFIG_ENV_BACK);
+   if (!back)
+      back = getenv("REQUEST_URI");
+   if (back && !strcmp(back, CONFIG_PAGE_LOGIN))
+      back = NULL;
+   if (!page)
+      page = (fail?CONFIG_PAGE_LOGIN:back?:CONFIG_PAGE_HOME);
+   v = page;
+   if (*v == '/')
+      v++;
+   printf("%s", v);
+   void add(const char *tag, const char *val) {
+      if (!tag || !*tag || !val || !*val)
+         return;
+      printf(v ? "?" : "&");
+      v = NULL;
+      printf("%s=", tag);
+      while (*val)
+      {
+         if (*val == ' ')
+            putchar('+');
+         else if (*val < ' ' || strchr(";?:@^=+$,/", *val))
+            printf("%%%02d", *val);
+         else
+            putchar(*val);
+         val++;
+      }
+   }
+   add(CONFIG_ENV_BACK, back);
+   add(CONFIG_ENV_FAIL, fail);
+   printf("\n\r\n\r");
+   fflush(stdout);
+}
 
 char *make_uuid(void)
 {                               // malloc'd random uuid
@@ -785,8 +831,7 @@ int main(int argc, char *argv[])
       if (host && uri)
       {
          char *temp = malloc(strlen(host) + strlen(uri) + 100),
-             *p = temp,
-             *q;
+             *p = temp;
          if (https)
             p += sprintf(p, "https://");
          else
@@ -795,7 +840,10 @@ int main(int argc, char *argv[])
          if (*CONFIG_ENVCGI_SERVER)
             setenv(CONFIG_ENVCGI_SERVER, temp, 1);
          sprintf(p - 1, "%s", uri);
-         q = p;
+         char *q = p;
+#ifdef	CONFIG_ENV_DB_FROM_URL
+         char *u = p;
+#endif
          while (*q && *q != '?')
             q++;
          if (*q == '?')
@@ -807,6 +855,16 @@ int main(int argc, char *argv[])
          *q = 0;
          if (*CONFIG_ENVCGI_DIRECTORY)
             setenv(CONFIG_ENVCGI_DIRECTORY, temp, 1);
+#ifdef	CONFIG_ENV_DB_FROM_URL
+         if (*u == '/')
+            u++;
+         q = u;
+         while (*q && *q != '/')
+            q++;
+         *q = 0;
+         if (*CONFIG_ENV_DB)
+            setenv(CONFIG_ENV_DB, u, 1);
+#endif
          if (!post)
          {
             q = getenv("QUERY_STRING");
@@ -836,12 +894,15 @@ int main(int argc, char *argv[])
    fflush(stdout);
 #endif
 #ifdef PLUGIN
-   int er = PLUGIN(session);
+   const char *er = PLUGIN(session);
 #ifdef	NONFATAL
    er = er;
 #else
    if (er)
-      return er;                // Failed
+   {                            // Direct to login page
+      sendredirect(NULL,er);
+      return 1;                // Failed
+   }
 #endif
 #endif
    if (argc > 1)
