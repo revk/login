@@ -50,8 +50,8 @@ int peek = 0;
 int PLUGIN(const char *);
 #endif
 
-char * make_uuid(void)
-{ // malloc'd random uuid
+char *make_uuid(void)
+{                               // malloc'd random uuid
    int f = open("/dev/urandom", O_RDONLY);
    if (f < 0)
    {
@@ -67,8 +67,9 @@ char * make_uuid(void)
    }
    v[6] = 0x40 | (v[6] & 0x0F); // Version 4: Random
    v[8] = 0x80 | (v[8] & 0x3F); // Variant 1
-	char *uuid=NULL;
-   if(asprintf(&uuid, "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15])<0)errx(1,"malloc");
+   char *uuid = NULL;
+   if (asprintf(&uuid, "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]) < 0)
+      errx(1, "malloc");
    close(f);
    return uuid;
 }
@@ -729,8 +730,9 @@ int main(int argc, char *argv[])
          {
             ev[e] = *q++;
             if (ev[e] != '=' && ev[e] >= ' ')
-               e++;             // dont allow some chars in the name part
+               e++;             // don't allow some chars in the name part
          }
+         int s = e;
          if (*q == '=')
          {
             ev[e++] = *q++;
@@ -742,8 +744,9 @@ int main(int argc, char *argv[])
             }
          } else
             ev[e] = '=';        // not value
-         // store
          ev[e] = 0;
+         if (*CONFIG_SESSION_COOKIE && s == 7 + sizeof(CONFIG_SESSION_COOKIE) - 1 && !memcmp(ev + 7, CONFIG_SESSION_COOKIE, sizeof(CONFIG_SESSION_COOKIE) - 1))
+            session = strdup(ev + s + 1);
          store(ev);
          if (*q == ';')
             q++;
@@ -757,10 +760,9 @@ int main(int argc, char *argv[])
 
    if (*CONFIG_SESSION_COOKIE)
    {
-	   session=getenv("COOKIE_"CONFIG_SESSION_COOKIE);
-      if (!session||!*session)
+      if (!session || !*session)
       {                         // Allocate a cookie
-         session=make_uuid();
+         session = make_uuid();
          if (!CONFIG_SESSION_EXPIRY)
             printf("Set-Cookie: %s=%s; Path=/; HTTPOnly;%s\r\n", CONFIG_SESSION_COOKIE, session, getenv("HTTPS") ? " Secure" : "");     // Only needs setting once
       }
@@ -836,7 +838,7 @@ int main(int argc, char *argv[])
 #ifdef PLUGIN
    int er = PLUGIN(session);
 #ifdef	NONFATAL
-   er=er;
+   er = er;
 #else
    if (er)
       return er;                // Failed
