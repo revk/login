@@ -2,9 +2,9 @@
 
 This is a generic set of tools that allow web CGI scripts to work with a login (managed by sql back end).
 
-The tool has to cater for a lot of possible usage scenarios, and so uses Kconfig (make menuconfig) to define the environment for usage. This then makes the individual tools very simple as they do not need a myriad of options.
+The tools have to cater for a lot of possible usage scenarios, and so uses Kconfig (`make menuconfig`) to define the environment for usage. This then makes the individual tools very simple as they do not need a myriad of options.
 
-## envcgi wrapper
+## `envcgi` wrapper
 
 There are wrapper tools, the main one being a generic `envcgi` tool which you use in a script. E.g. if your script normally started with (old school!) `#!/bin/csh` you can *wrap* it by using `#!envcgi /bin/csh` instead, though typically it would be something like `#!../login/envcgi /bin/csh` if you have `login` checked out a directory above.
 
