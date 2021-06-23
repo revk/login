@@ -53,3 +53,7 @@ The database is used to track the logged in user - the database and table and co
 The user fields in the user table are normally provided to the environment, but these can be selected and prefixed and upper cased, based on configuration.
 
 The session expiry is a configurable setting and can be set never to expire if you prefer.
+
+## Library
+
+Library versions of `login`, `logout`, `logincheck`, `password`, `changepassword` are provided to link in to your own code.
