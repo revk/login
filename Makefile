@@ -1,4 +1,4 @@
-all:	password envcgi loggedin logincheck login logout changepassword
+all:	password envcgi loggedin logincheck dologin dologout changepassword
 
 ifneq ($(wildcard /usr/bin/mysql_config),)
 SQLINC=$(shell mysql_config --include)
@@ -38,16 +38,16 @@ logincheck: envcgi.c logincheck.o
 logincheck.o: logincheck.c config.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-login: login.c login.o envcgi.o
+dologin: dologin.c dologin.o envcgi.o
 	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o envcgi.o -largon2
 
-login.o: login.c login.h SQLlib/sqllib.o
+dologin.o: dologin.c dologin.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-logout: logout.c logout.o
+dologout: dologout.c dologout.o
 	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
 
-logout.o: logout.c logout.h SQLlib/sqllib.o
+dologout.o: dologout.c dologout.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 changepassword: changepassword.c changepassword.o

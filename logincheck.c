@@ -15,6 +15,9 @@
 
 const char * logincheck(const char *session)
 {                               // Do plugin checks after envcgi has set session and environment and so on - return 0 if OK
+	#ifdef  CONFIG_DB_DEBUG
+        sqldebug=1;
+#endif
    // Clearing some variables
    if (*CONFIG_ENV_USER_ID)
       unsetenv(CONFIG_ENV_USER_ID);
@@ -26,6 +29,9 @@ const char * logincheck(const char *session)
    if (*CONFIG_DB_DATABASE)
       sql_safe_select_db(&sql, CONFIG_DB_DATABASE);
 #endif
+ // TODO basic auth as well
+
+   return "TODO";
 
 
    sql_close(&sql);

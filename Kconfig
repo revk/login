@@ -25,13 +25,13 @@ menu "Database"
 	help
 		Table for user ID and password
 
-    config DB_USER_FIELD
+    config DB_USERNAME_FIELD
     	string "User login field"
 	default "user"
 	help
 		The field name in user table for the user login name/email/etc
 
-    config DB_PASS_FIELD
+    config DB_PASSWORD_FIELD
     	string "User password field"
 	default "pass"
 	help
@@ -88,6 +88,12 @@ menu "Database"
 	depends on DB_SEPARATE_SESSION
 	help
 		Field name for logged in IP address varchar(39) - updated if it changes...
+
+    config DB_DEBUG
+    	bool "Turn on database debug"
+	default n
+	help
+		Database debug to stderr
 
 endmenu
 

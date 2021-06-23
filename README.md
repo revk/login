@@ -32,13 +32,13 @@ Obviously these also pass any form data as environment variables in the same way
 
 There are also tools that the scripts can use.
 
-`login` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a login. Normally this is `$USERNAME` and `$PASSWORD` but the fields can be configured. It returns a status 0 if the login worked. **This writes to stdout with error reason if login fails, so should be caputured, or use `--silent`**
+`dologin` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a login. Normally this is `$USERNAME` and `$PASSWORD` but the fields can be configured. It returns a status 0 if the login worked. **This writes to stdout with error reason if login fails, so should be caputured, or use `--silent`**
 
-Note that `login --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to home or login page with error based on login result.
+Note that `dologin --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to home or login page with error based on login result.
 
-`logout` will logout. It returns status 0 if was logged in.
+`dologout` will logout. It returns status 0 if was logged in.
 
-Note that `logout --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to login page.
+Note that `dologout --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to login page.
 
 `changepassword` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a password change. Normally this is `$OLDPASSWORD` and `$NEWPASSWORD`. It returns a status 0 if the password was changed. You have to be logged in for this to work. **This writes to stdout with error reason if change fails, so should be caputured, or use `--silent`**
 

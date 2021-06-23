@@ -25,7 +25,6 @@
 #include <err.h>
 #include <sys/time.h>
 #include <time.h>
-#include <sqllib.h>
 #include <syslog.h>
 #include <execinfo.h>
 #include <openssl/sha.h>
