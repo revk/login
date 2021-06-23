@@ -12,7 +12,10 @@ SQLVER=$(shell mariadb_config --version | sed 'sx\..*xx')
 endif
 
 COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC}
-LINKFLAGS=${CCFLAGS} ${SQLLIB} -lcrypto -lssl
+LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
+
+SQLlib/sqllib.o: SQLlib/sqllib.c
+	make -C SQLlib
 
 envcgi: envcgi.c envcgi.o errorwrap.o
 	gcc -o $@ $< ${LINKFLAGS} errorwrap.o
