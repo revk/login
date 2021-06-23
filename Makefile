@@ -35,4 +35,4 @@ menuconfig:
 	touch .config
 
 config.h: .config
-	sed -e '/^$$/d' -e '/#.*/d' -e 's/^/#define /' -e 's/=/ /' $< > $@
+	sed -e 's/^#/\/\//' -e 's/^CONFIG_/#define CONFIG_/' -e 's/=/ /' $< > $@

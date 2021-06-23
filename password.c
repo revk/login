@@ -149,9 +149,15 @@ const char *password(int min, int max, int entropy)
 #ifndef	LIB                     // Command line
 int main(int argc, const char *argv[])
 {
+   int min = CONFIG_PASSWORD_MIN;
+   int max = CONFIG_PASSWORD_MAX;
+   int entropy = CONFIG_PASSWORD_ENTROPY;
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
+         { "min", 'm', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &min, 0, "Min password len", "characters" },
+         { "max", 'x', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &max, 0, "Max password len", "characters" },
+         { "entropy", 'e', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &entropy, 0, "Min entropy", "bits" },
          POPT_AUTOHELP { }
       };
 
@@ -169,8 +175,10 @@ int main(int argc, const char *argv[])
       }
       poptFreeContext(optCon);
    }
-   // TODO
 
+   const char *pass = password(min, max, entropy);
+   printf("%s", pass);
+   free((char *) pass);
 
    return 0;
 }

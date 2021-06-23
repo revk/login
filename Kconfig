@@ -13,6 +13,35 @@ endmenu
 
 menu "Passwords"
 
+    config PASSWORD_MIN
+    	int "Min password length"
+	default 8
+	help
+		Default minimum password length
+
+    config PASSWORD_MAX
+    	int "Max password length"
+	default 32
+	help
+		Default maximum password length
+
+    config PASSWORD_ENTROPY
+    	int "Min password entropy"
+	default 40
+	help
+		Default minimum password entropy
+
+    config PASSWORD_MYSQL
+    	bool "Accept mysql hash"
+	default y
+	help
+		Accept mysql hashes
+
+    config PASSWORD_OLDMYSQL
+    	bool "Accept very old mysql hash"
+	default n
+	help
+		Accept the very insure very old mysql password hashes
 endmenu
 
 menu "Misc"
