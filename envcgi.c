@@ -758,7 +758,7 @@ int main(int argc, char *argv[])
    if (*CONFIG_SESSION_COOKIE)
    {
 	   session=getenv("COOKIE_"CONFIG_SESSION_COOKIE);
-      if (!*session)
+      if (!session||!*session)
       {                         // Allocate a cookie
          session=make_uuid();
          if (!CONFIG_SESSION_EXPIRY)
