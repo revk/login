@@ -2,6 +2,16 @@ menu "Database"
 
 endmenu
 
+menu "Pages"
+
+    config PAGE_LOGIN
+	string "Login"
+	default "/login.cgi"
+	help
+		Login page to which user is redirected
+
+endmenu
+
 menu "Environment"
 
     config ENV_SESSION
@@ -9,6 +19,12 @@ menu "Environment"
 	default "ENVCGI"
 	help
 		Name of session environment variable
+
+    config ENV_BACK
+	string "Back link environment variable"
+	default "BACK"
+	help
+		Environment variable included when redirecting to login page to allow return to requested page (if was a GET)
 endmenu
 
 menu "Passwords"
@@ -30,6 +46,36 @@ menu "Passwords"
 	default 40
 	help
 		Default minimum password entropy
+
+    config PASSWORD_UPDATE
+    	bool "Update to latest hash on login"
+	default y
+	help
+		Update hash to latest hash on successful login
+
+    config PASSWORD_ARGON2
+    	bool "Accept Argon2 hash"
+	default y
+	help
+		Accept Argon2 hashes
+
+    config PASSWORD_SHA256
+    	bool "Accept SHA256 hash"
+	default y
+	help
+		Accept SHA256 hashes
+
+    config PASSWORD_SHA1
+    	bool "Accept SHA1 hash"
+	default y
+	help
+		Accept SHA1 hashes
+
+    config PASSWORD_MD5
+    	bool "Accept MD5 hash"
+	default y
+	help
+		Accept MD5 hashes
 
     config PASSWORD_MYSQL
     	bool "Accept mysql hash"
