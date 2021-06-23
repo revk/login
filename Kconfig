@@ -4,8 +4,23 @@ endmenu
 
 menu "Environment"
 
+    config ENV_SESSION
+	string "Session environment variable"
+	default "ENVCGI"
+	help
+		Name of session environment variable
 endmenu
 
 menu "Passwords"
+
+endmenu
+
+menu "Misc"
+
+    config SESSION_COOKIE
+	string "Session cookie"
+	default "ENVCGI"
+	help
+		Name of session cookie
 
 endmenu

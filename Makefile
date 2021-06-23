@@ -29,7 +29,8 @@ password.o: password.c password.h config.h
 menuconfig:
 	kconfig-mconf Kconfig
 
-sdkconfig: Kconfig Makefile
+.config: Kconfig Makefile
 	kconfig-mconf Kconfig
 
-config.h: sdkconfig
+config.h: .config
+	sed -e '/^$$/d' -e '/#.*/d' -e 's/^/#define /' -e 's/=/ /' $< > $@
