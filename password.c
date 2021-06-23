@@ -162,7 +162,6 @@ int main(int argc, const char *argv[])
       };
 
       optCon = poptGetContext(NULL, argc, argv, optionsTable, 0);
-      //poptSetOtherOptionHelp (optCon, "");
 
       int c;
       if ((c = poptGetNextOpt(optCon)) < -1)

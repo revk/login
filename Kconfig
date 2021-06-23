@@ -1,8 +1,33 @@
 menu "Database"
 
+    config DB_CONF
+    	string "Database access config file"
+	default ""
+	help
+		Specify the path of the mysql.conf file for database access
+
+    config DB_FROM_ENV
+    	bool "Expect database name in environment"
+	default n
+	help
+		If database name is expected from an environment variable
+
+    config DB_DB
+    	string "Database name"
+	default ""
+	depends on !DB_FROM_ENV
+	help
+		Fixed database name to use (may be in mysql.conf if not set here)
+
 endmenu
 
-menu "Pages"
+menu "CGI Wrapper"
+
+    config SESSION_COOKIE
+	string "Session cookie"
+	default "ENVCGI"
+	help
+		Name of session cookie
 
     config PAGE_LOGIN
 	string "Login"
@@ -10,9 +35,23 @@ menu "Pages"
 	help
 		Login page to which user is redirected
 
+    config ENV_DB_FROM_URL
+    	bool "Set database environment variable from first part of URL"
+	default n
+	depends on DB_FROM_ENV
+	help
+		Sets the database environment variable based on the first part of url, e.g. https://example.com/from/stuff.cgi sets to from
+
 endmenu
 
 menu "Environment"
+
+    config ENV_DB
+    	string "Database environment variable"
+	default ""
+	depends on DB_FROM_ENV
+	help
+		Name of database environment variable
 
     config ENV_SESSION
 	string "Session environment variable"
@@ -88,14 +127,6 @@ menu "Passwords"
 	default n
 	help
 		Accept the very insure very old mysql password hashes
-endmenu
-
-menu "Misc"
-
-    config SESSION_COOKIE
-	string "Session cookie"
-	default "ENVCGI"
-	help
-		Name of session cookie
 
 endmenu
+
