@@ -29,6 +29,7 @@
 #include <syslog.h>
 #include <execinfo.h>
 #include <openssl/sha.h>
+#include "envcgi.h"
 #include "errorwrap.h"
 
 #define MAX 110240
@@ -47,8 +48,30 @@ int peek = 0;
 
 #ifdef PLUGIN
 int PLUGIN(const char *);
-
 #endif
+
+void make_uuid(char uuid[UUID_LEN + 1])
+{
+   *uuid = 0;
+   int f = open("/dev/urandom", O_RDONLY);
+   if (f < 0)
+   {
+      warn("Random open failed");
+      return;
+   }
+   unsigned char v[16];
+   if (read(f, &v, sizeof(v)) != sizeof(v))
+   {
+      close(f);
+      warn("Random read failed");
+      return;
+   }
+   v[6] = 0x40 | (v[6] & 0x0F); // Version 4: Random
+   v[8] = 0x80 | (v[8] & 0x3F); // Variant 1
+   snprintf(uuid, UUID_LEN + 1, "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X", v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]);
+   close(f);
+}
+
 
 // read next actual charge from query
 int qget(void)
@@ -731,8 +754,61 @@ int main(int argc, char *argv[])
       }
    }
 
-   // Get session cookie, and update
-   // TODO
+   if (*CONFIG_SESSION_COOKIE)
+   {
+      session = malloc(UUID_LEN + 1);
+      if (!session)
+         errx(1, "malloc");
+      // Get session cookie, and update
+      const int len = sizeof(CONFIG_SESSION_COOKIE) - 1;
+      const char *cookie = getenv("HTTP_COOKIE");
+      if (cookie)
+      {                         // Look for one
+         while (*cookie)
+         {
+            if (!strncmp(cookie, CONFIG_SESSION_COOKIE, len))
+            {
+               cookie += len;
+               while (*cookie == ' ' || *cookie == '\t')
+                  cookie++;
+               if (*cookie == '=')
+               {
+                  cookie++;
+                  while (*cookie == ' ' || *cookie == '\t')
+                     cookie++;
+                  const char *v = cookie;
+                  while ((*cookie >= 'A' && *cookie <= 'Z') || (*cookie >= '0' && *cookie <= '9') || *cookie == '-')
+                     cookie++;
+                  if ((cookie - v) == UUID_LEN)
+                  {             // Found
+                     memmove(session, v, UUID_LEN);
+                     session[UUID_LEN] = 0;
+                     break;
+                  }
+               }
+            }
+            while (*cookie && *cookie != ';')
+               cookie++;
+            if (*cookie == ';')
+               cookie++;
+            while (*cookie == ' ' || *cookie == '\t')
+               cookie++;
+         }
+      }
+      if (!*session)
+      {                         // Allocate a cookie
+         make_uuid(session);
+         if (!CONFIG_SESSION_EXPIRY)
+            printf("Set-Cookie: %s=%s; Path=/; HTTPOnly;%s\r\n", CONFIG_SESSION_COOKIE, session, getenv("HTTPS") ? " Secure" : "");     // Only needs setting once
+      }
+      if (CONFIG_SESSION_EXPIRY)
+      {                         // Refresh expiry
+         time_t now = time(0) + CONFIG_SESSION_EXPIRY * 3600;
+         char temp[50];
+         strftime(temp, sizeof(temp), "%a, %d-%b-%Y %T GMT", gmtime(&now));
+         printf("Set-Cookie: %s=%s; Path=/; Max-Age=%d; Expires=%s; HTTPOnly;%s\r\n", CONFIG_SESSION_COOKIE, session, CONFIG_SESSION_EXPIRY * 3600, temp, getenv("HTTPS") ? " Secure" : "");
+      }
+   }
 
    if (session && *CONFIG_ENV_SESSION)
       setenv(CONFIG_ENV_SESSION, session, 1);
@@ -795,32 +871,38 @@ int main(int argc, char *argv[])
    fflush(stdout);
 #endif
 #ifdef PLUGIN
-   if (!(PLUGIN(session)))
+   int er = PLUGIN(session);
+#ifdef	NONFATAL
+   er=er;
+#else
+   if (er)
+      return er;                // Failed
 #endif
-      if (argc > 1)
-      {                         /* Execute the arguments */
-         int a;
-         char *cmd = argv[1];
-         char *s = strchr(cmd, ' ');
-         if (s)
-         {
-            *s++ = 0;
-            argv[1] = s;
-            argv[argc] = 0;
-         } else
-         {
-            for (a = 1; a < argc - 1; a++)
-               argv[a] = argv[a + 1];
-            argv[argc - 1] = 0;
-         }
-         s = strrchr(cmd, '/');
-         if (s)
-            argv[0] = s + 1;
-         else
-            argv[0] = cmd;
-         fflush(stdout);
-         execvp(cmd, argv);
+#endif
+   if (argc > 1)
+   {                            /* Execute the arguments */
+      int a;
+      char *cmd = argv[1];
+      char *s = strchr(cmd, ' ');
+      if (s)
+      {
+         *s++ = 0;
+         argv[1] = s;
+         argv[argc] = 0;
+      } else
+      {
+         for (a = 1; a < argc - 1; a++)
+            argv[a] = argv[a + 1];
+         argv[argc - 1] = 0;
       }
+      s = strrchr(cmd, '/');
+      if (s)
+         argv[0] = s + 1;
+      else
+         argv[0] = cmd;
+      fflush(stdout);
+      execvp(cmd, argv);
+   }
    return 0;
 }
 #endif

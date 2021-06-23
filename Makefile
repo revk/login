@@ -1,4 +1,4 @@
-all:	password envcgi login logout loggedin logincheck changepassword
+all:	password envcgi loggedin logincheck login logout changepassword
 
 ifneq ($(wildcard /usr/bin/mysql_config),)
 SQLINC=$(shell mysql_config --include)
@@ -27,6 +27,33 @@ password: password.c password.o
 	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt
 
 password.o: password.c password.h config.h xkcd936-wordlist.h
+	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
+
+loggedin: envcgi.c logincheck.o
+	gcc -o $@ $< logincheck.o errorwrap.o -DPLUGIN=logincheck ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+
+logincheck: envcgi.c logincheck.o
+	gcc -o $@ $< logincheck.o errorwrap.o -DPLUGIN=logincheck -DNONFATAL ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+
+logincheck.o: logincheck.c config.h SQLlib/sqllib.o
+	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
+
+login: login.c login.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+
+login.o: login.c login.h SQLlib/sqllib.o
+	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
+
+logout: logout.c logout.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+
+logout.o: logout.c logout.h SQLlib/sqllib.o
+	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
+
+changepassword: changepassword.c changepassword.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+
+changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 menuconfig:

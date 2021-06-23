@@ -72,7 +72,6 @@ menu "Database"
     config DB_USER_KEY_FIELD
     	string "Field name in user table that is primary key linked from session table"
 	default "ID"
-	depends on DB_SEPARATE_SESSION
 	help
 		Field name of primary key in user table linked from session table
 
@@ -160,6 +159,12 @@ menu "Environment"
 	default "ENVCGI"
 	help
 		Name of session environment variable
+
+    config ENV_USER_ID
+    	string "Environment variable for logged in user ID"
+	default "USER_ID"
+	help
+		Users unique ID from user table for logged in user
 
     config ENV_BACK
 	string "Back link environment variable"
