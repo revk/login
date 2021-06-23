@@ -118,6 +118,32 @@ menu "CGI Wrapper"
 	depends on DB_FROM_ENV
 	help
 		Sets the database environment variable based on the first part of url, e.g. https://example.com/from/stuff.cgi sets to from
+
+    config FORM_SECURITY
+    	bool "Perform security checks on forms"
+	default n
+	help
+		Checks and sets environment variables used to provide form security
+
+    config FORM_SECURITY_AGE
+    	int "How long a form remains value, in minutes"
+	default 60
+	help
+		Set how long the form remains valid (in minutes)
+
+    config FORM_SECURITY_TAG
+    	string "The field name for form security (does not normally need changing)"
+	default "*"
+	depends on FORM_SECURITY
+	help
+		This is a deliberately obscure form field name to avoid any clashes.
+
+    config CGI_PATH
+    	string "Fixed path under which to run CGI, colon separated"
+	default "/projects/tools/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/mysql/bin"
+	help
+		Force a specific PATH for CGI scripts
+
 endmenu
 
 menu "Environment"
@@ -140,6 +166,69 @@ menu "Environment"
 	default "BACK"
 	help
 		Environment variable included when redirecting to login page to allow return to requested page (if was a GET)
+
+    config ENV_SECURITY
+    	string "Environment / form field name used for checking form security"
+	default "*"
+	help
+		Used by secureform command
+
+    config ENVCGI_SERVER
+    	string "Environment variable to set for simplified server name"
+	default "ENVCGI_SERVER"
+	help
+		Extracted server name from apache variables
+
+    config ENVCGI_SCRIPT
+    	string "Environment variable to set for simplified server name"
+	default "ENVCGI_SCRIPT"
+	help
+		Extracted script name from apache variables
+
+    config ENVCGI_DIRECTORY
+    	string "Environment variable to set for simplified server name"
+	default "ENVCGI_DIRECTORY"
+	help
+		Extracted director name from apache variables
+
+    config ENVCGI_QUERY
+    	string "Environment variable to set for simplified server name"
+	default "ENVCGI_QUERY"
+	help
+		Extracted query name from apache variables
+
+    config ENV_FORM_SECURITY_NAME
+    	string "Environment variable holding the field name to use for form security"
+	default "FORM_SECURITY_NAME"
+	depends on FORM_SECURITY
+	help
+		Use the content of this variable as the name for a hidden field in any form you make.
+
+    config ENV_FORM_SECURITY_OK
+    	string "Environment variable that is only set if the form security passed"
+	default "FORM_SECURITY_OK"
+	depends on FORM_SECURITY
+	help
+		If a form security check passed, this is set. Otherwise it is unset.
+
+    config ENV_FORM_SECURITY_VALUE
+    	string "Environment variable holding the field value to use for form security"
+	default "FORM_SECURITY_VALUE"
+	depends on FORM_SECURITY
+	help
+		Use the content of this variable as the value for a hidden field in any form you make.
+
+    config ENV_RELAY_ADDR
+    	string "Environment variable set if relayed via proxy"
+	default "RELAY_ADDR"
+	help
+		When using a proxy, we set the original IP/Host if same /48 IPv6, and set this variable as original IP
+
+    config ENV_HTTP_BAD_REFERER
+    	string "Environment variable set if there seems to be a bad referrer"
+	default "HTTP_BAD_REFERER"
+	help
+		Set if referrer not same domain / subdomain.
 
 endmenu
 

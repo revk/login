@@ -14,6 +14,8 @@ The easiest way to understand this is try it, printing the environment when you 
 
 `envcgi` and related tools set a session tracking cookie used to manage login. Whilst a session cookie is normally used, it is possible to also allow http authentication if the header is configured in apache, and so allow per page access login with correct password (e.g. to use with curl).
 
+The wrapper can also perform form security checks - providing an environment variable to include in a form that is then checked when the form is received.
+
 ## Logged in wrapper
 
 There are variations of `envcgi` for login handling. These are `loggedin` and `logincheck` and used in the same way, e.g. `#!../login/loggedin /bin/csh`
