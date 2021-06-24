@@ -7,6 +7,9 @@
 
 void sendredirect(const char *page, const char *fail)
 {
+   static char havesentredirect = 0;
+   if (havesentredirect)
+      return;
    const char *v;
    printf("Location: ");
    if (*CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
@@ -48,5 +51,6 @@ void sendredirect(const char *page, const char *fail)
    add(CONFIG_ENV_BACK, back);
    add(CONFIG_ENV_FAIL, fail);
    printf("\n\r\n\r");
+   havesentredirect = 1;
    fflush(stdout);
 }

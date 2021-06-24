@@ -53,8 +53,8 @@ dologout: dologout.c dologout.o redirect.o selectdb.o
 dologout.o: dologout.c dologout.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-changepassword: changepassword.c changepassword.o logincheck.o hashes.o selectdb.o base64.o
-	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2 selectdb.o base64.o
+changepassword: changepassword.c changepassword.o logincheck.o hashes.o selectdb.o base64.o redirect.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2 selectdb.o base64.o redirect.o
 
 changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

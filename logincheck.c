@@ -14,6 +14,7 @@
 #include "envcgi.h"
 #include "dologin.h"
 #include "hashes.h"
+#include "redirect.h"
 #include "base64.h"
 #include "logincheck.h"
 
@@ -78,10 +79,14 @@ const char *logincheck(const char *session)
    selectdb(&sql);
    SQL_RES *res = find_session(&sql, session);
    loginenv(res);
+   char nopass = 0;
    const char *fail = NULL;
    if (res)
+   {
+      if (*CONFIG_DB_PASSWORD_FIELD && !sql_col(res, CONFIG_DB_PASSWORD_FIELD))
+         nopass = 1;
       sql_free_result(res);
-   else
+   } else
       fail = "Not logged on";
    if (fail)
    {                            // Failed, check http auth (always done as envcgi controls if allowed or not)
@@ -131,6 +136,12 @@ const char *logincheck(const char *session)
       }
    }
    sql_close(&sql);
+   if (!fail && nopass)
+   {
+      fail = "User has no password";
+      if (*CONFIG_PAGE_PASSWORD)
+         sendredirect(CONFIG_PAGE_PASSWORD, fail);
+   }
    return fail;
 }
 

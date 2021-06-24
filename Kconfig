@@ -124,6 +124,12 @@ menu "CGI Wrapper"
 	help
 		Login page to which user is redirected when not logged in
 
+    config PAGE_PASSWORD
+	string "Password page"
+	default "/changedpassword.cgi"
+	help
+		Page to which user is redirected when logged in but with no password set (e.g. new user)
+
     config ENV_DB_FROM_URL
     	bool "Set database environment variable from first part of URL"
 	default n
