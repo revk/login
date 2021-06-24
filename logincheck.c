@@ -52,10 +52,14 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
 #endif
       const char *a,
       *b;
+#ifdef CONFIG_DB_SESSION_IP
       if (*CONFIG_DB_SESSION_IP && (a = getenv("REMOTE_ADDR")) && (b = sql_colz(res, CONFIG_DB_SESSION_IP)) && strcmp(a, b))
          sql_sprintf(&s, "`%#S`=%#s", CONFIG_DB_SESSION_IP, a);
+#endif
+#ifdef CONFIG_DB_SESSION_AGENT
       if (*CONFIG_DB_SESSION_AGENT && (a = getenv("HTTP_USER_AGENT")) && (b = sql_colz(res, CONFIG_DB_SESSION_AGENT)) && strcmp(a, b))
          sql_sprintf(&s, "`%#S`=%#s", CONFIG_DB_SESSION_AGENT, a);
+#endif
       if (sql_back_s(&s) == ',')
       {
          sql_sprintf(&s, " WHERE `%#S`=%#s", CONFIG_DB_SESSION_FIELD, session);

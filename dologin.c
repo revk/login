@@ -69,7 +69,7 @@ const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQ
       sql_free_s(&s);
    if (!sql_affected_rows(sqlp))
       return "Login failed";
-   logincheck(session); // Updates fields as needed
+   find_session(sqlp,session); // Updates fields
    return NULL;
 }
 
