@@ -99,7 +99,7 @@ int main(int argc, const char *argv[])
          fail = "Blank passwords are not supported";
       else
       {
-	 selectdb(&sql);
+         selectdb(&sql);
          char *newhash = password_hash(newpassword);
          sql_safe_query_free(&sql, sql_printf("UPDATE `%#S` SET `%#S`=%#s WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_PASSWORD_FIELD, newhash, CONFIG_DB_USERNAME_FIELD, username));
          free(newhash);

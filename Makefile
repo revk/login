@@ -17,8 +17,8 @@ LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 SQLlib/sqllib.o: SQLlib/sqllib.c
 	make -C SQLlib
 
-envcgi: envcgi.c envcgi.o errorwrap.o redirect.o
-	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o
+envcgi: envcgi.c envcgi.o errorwrap.o redirect.o base64.o
+	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o base64.o
 
 envcgi.o: envcgi.c envcgi.h config.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
@@ -29,11 +29,11 @@ password: password.c password.o
 password.o: password.c password.h config.h xkcd936-wordlist.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-loggedin: envcgi.c logincheck.o hashes.o redirect.o selectdb.o
-	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o
+loggedin: envcgi.c logincheck.o hashes.o redirect.o selectdb.o base64.o
+	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o base64.o
 
-logincheck: envcgi.c logincheck.o hashes.o redirect.o selectdb.o
-	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -DNONFATAL ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o
+logincheck: envcgi.c logincheck.o hashes.o redirect.o selectdb.o base64.o
+	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -DNONFATAL ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o base64.o
 
 logincheck.o: logincheck.c config.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
@@ -50,8 +50,8 @@ dologout: dologout.c dologout.o redirect.o selectdb.o
 dologout.o: dologout.c dologout.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-changepassword: changepassword.c changepassword.o logincheck.o hashes.o selectdb.o
-	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2 selectdb.o
+changepassword: changepassword.c changepassword.o logincheck.o hashes.o selectdb.o base64.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2 selectdb.o base64.o
 
 changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

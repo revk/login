@@ -15,4 +15,3 @@ void selectdb(SQL * sqlp)
    sql_safe_select_db(sqlp, v);
 #endif
 }
-

@@ -14,9 +14,8 @@
 #include "envcgi.h"
 #include "dologin.h"
 #include "hashes.h"
+#include "base64.h"
 #include "logincheck.h"
-
-static const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 SQL_RES *find_session(SQL * sqlp, const char *session)
 {
@@ -79,26 +78,7 @@ const char *logincheck(const char *session)
             fail = "Must use https - your password may now be compromised";
          else
          {
-            auth = strdup(auth);
-            size_t v = 0,
-                b = 0,
-                i = 0,
-                o = 0;
-            while (auth[i])
-            {
-               char *q = strchr(BASE64, auth[i] == ' ' ? '+' : auth[i]);        // Note that + changes to space if used raw in a URL
-               if (!q)
-                  break;
-               i++;
-               b += 6;
-               v = (v << 6) + (q - BASE64);
-               while (b >= 8)
-               {
-                  b -= 8;
-                  auth[o++] = (v >> b);
-               }
-            }
-            auth[o] = 0;
+            base64d(&auth, auth);
             char *pass = strchr(auth, ':');
             if (pass)
             {

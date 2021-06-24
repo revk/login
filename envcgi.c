@@ -29,6 +29,7 @@
 #include <openssl/sha.h>
 #include "redirect.h"
 #include "errorwrap.h"
+#include "base64.h"
 #include "envcgi.h"
 
 #define MAX 110240
@@ -36,10 +37,6 @@
 
 #define Q(x) #x                 // Trick to quote defined fields
 #define QUOTE(x) Q(x)
-
-#ifdef	CONFIG_FORM_SECURITY
-static const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-#endif
 
 char *q;
 char post = 0;
@@ -188,41 +185,7 @@ void form_security(void)
       for (q = SHA_DIGEST_LENGTH; q < sizeof(hash); q++)
          hash[q] ^= hash[q - SHA_DIGEST_LENGTH];
    }
-   char b64[sizeof(hash) * 8 / 6 + 4];
-   {                            // Generate base64
-      size_t v = 0,
-          b = 0,
-          i = 0,
-          o = 0;
-      while (i < sizeof(hash))
-      {
-         b += 8;
-         v = (v << 8) + hash[i++];
-         while (b >= 6)
-         {
-            b -= 6;
-            b64[o++] = BASE64[(v >> b) & 0x3F];
-         }
-      }
-      if (b)
-      {
-         b += 8;
-         v <<= 8;
-         b -= 6;
-         b64[o++] = BASE64[(v >> b) & 0x3F];
-         while (b)
-         {
-            while (b >= 6)
-            {
-               b -= 6;
-               b64[o++] = '=';
-            }
-            if (b)
-               b += 8;
-         }
-      }
-      b64[o] = 0;
-   }
+   char *b64 = base64e(hash, sizeof(hash));
    const char *form = NULL;
    if (*CONFIG_FORM_SECURITY_TAG)
       form = getenv(CONFIG_FORM_SECURITY_TAG);
@@ -234,28 +197,11 @@ void form_security(void)
       setenv(CONFIG_ENV_FORM_SECURITY_NAME, CONFIG_FORM_SECURITY_TAG, 1);
    if (form)
    {                            // Check security passed in (form or get)
-      size_t v = 0,
-          b = 0,
-          i = 0,
-          o = 0;
-      while (form[i] && o < sizeof(hash))
-      {
-         char *q = strchr(BASE64, form[i] == ' ' ? '+' : form[i]);      // Note that + changes to space if used raw in a URL
-         if (!q)
-            break;
-         i++;
-         b += 6;
-         v = (v << 6) + (q - BASE64);
-         while (b >= 8)
-         {
-            b -= 8;
-            hash[o++] = (v >> b);
-         }
-      }
-      while (form[i] == '=')
-         i++;
-      if (!form[i] && o == sizeof(hash))
+      unsigned char *newhash = NULL;
+      size_t len = base64d(&newhash, form);
+      if (len == sizeof(hash))
       {                         // Looks good, check hash
+         memcpy(hash, newhash, len);
          time_t when;
          int q;
          for (q = sizeof(hash); q > SHA_DIGEST_LENGTH; q--)
@@ -281,7 +227,10 @@ void form_security(void)
             fprintf(stderr, "Bad security time %d\n", (int) (now - when));
       } else
          fprintf(stderr, "Bad security string %s\n", form);
+      if (newhash)
+         free(newhash);
    }
+   free(b64);
 }
 #endif
 
