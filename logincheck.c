@@ -38,10 +38,12 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
             if (*CONFIG_DB_SESSION_EXPIRES)
             {
                time_t now = time(0);
-               time_t expires = sql_time(sql_colz(res, "CONFIG_DB_SESSION_EXPIRES"));
+               time_t expires = sql_time(sql_colz(res, CONFIG_DB_SESSION_EXPIRES));
                if (expires < now)
+               {
+                  warnx("Session for %s expired", sql_col(res, CONFIG_DB_USERNAME_FIELD));
                   found = NULL;
-               else
+               } else
                {
                   time_t end = now + 3600 * CONFIG_SESSION_EXPIRY;
                   if (expires < end - 1800)
