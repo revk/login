@@ -76,7 +76,7 @@ menuconfig:
 	./makek ${KCONFIG_CONFIG} config.h
 
 config.h: Kconfig
-	./makek ${KCONFIG_CONFIG} $@
+	./makek ${KCONFIG_CONFIG} config.h
 
 ${KCONFIG_CONFIG}: Kconfig
-	./makek ${KCONFIG_CONFIG} $@
+	./makek ${KCONFIG_CONFIG} config.h
