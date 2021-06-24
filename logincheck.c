@@ -86,7 +86,6 @@ const char *logincheck(const char *session)
    if (fail)
    {                            // Failed, check http auth (always done as envcgi controls if allowed or not)
       char *auth = getenv("HTTP_AUTHORIZATION");
-      warnx("auth %s", auth);
       if (auth && !strncasecmp(auth, "Basic ", 6))
       {                         // We have basic auth, decode base64 for username and password
          auth += 6;
