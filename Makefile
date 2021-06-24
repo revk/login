@@ -11,14 +11,14 @@ SQLLIB=$(shell mariadb_config --libs)
 SQLVER=$(shell mariadb_config --version | sed 'sx\..*xx')
 endif
 
-COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC} -DBUILDTIME=`date +%FT%T.%N`
+COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC}
 LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 
 SQLlib/sqllib.o: SQLlib/sqllib.c
 	make -C SQLlib
 
-envcgi: envcgi.c envcgi.o errorwrap.o redirect.o base64.o
-	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o base64.o
+envcgi: envcgi.c envcgi.o errorwrap.o redirect.o base64.o password
+	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o base64.o -DSECRET=`./password`
 
 envcgi.o: envcgi.c envcgi.h config.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

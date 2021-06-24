@@ -167,7 +167,7 @@ void store(char *var)
 #ifdef	CONFIG_FORM_SECURITY
 void form_security(void)
 {
-   const char *secret = QUOTE(BUILDTIME);
+   const char *secret = QUOTE(SECRET);
    int age = 60 * CONFIG_FORM_SECURITY_AGE;
    if (*CONFIG_ENV_FORM_SECURITY_OK)
       unsetenv(CONFIG_ENV_FORM_SECURITY_OK);    // default is not OK
