@@ -32,7 +32,7 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
          time_t expires = sql_time(sql_colz(res, CONFIG_DB_SESSION_EXPIRES));
          if (expires < now)
          {
-            warnx("Session for %s expired", sql_col(res, CONFIG_DB_USERNAME_FIELD));
+            warnx("Session for %s expired", uid);
             found = NULL;
             uid = NULL;
          } else

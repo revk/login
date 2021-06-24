@@ -100,7 +100,6 @@ int main(int argc, const char *argv[])
       while (h < hours)
       {
          char *try = makehash(h, value);
-         warnx("Test %d %s %s %s", h, try, hash, value);
          if (!strcmp(try, hash))
          {                      // Match
             free(try);
