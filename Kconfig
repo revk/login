@@ -33,15 +33,9 @@ menu "Database"
 
     config DB_PASSWORD_FIELD
     	string "User password hash field"
-	default "pass"
+	default "hash"
 	help
 		The field name in user table for the password hash
-
-    config DB_LAST_LOGIN_FIELD
-    	string "User lastlogin field"
-	default ""
-	help
-		The field name in user table for the last time logged in
 
     config DB_SEPARATE_SESSION
     	bool "Separate session table"
@@ -112,13 +106,13 @@ menu "CGI Wrapper"
 		Session expiry (hours), set 0 for unlimited
 
     config PAGE_HOME
-	string "Login"
+	string "Home page"
 	default "/"
 	help
 		Home page to which user is redirected when logged in (if not back link)
 
     config PAGE_LOGIN
-	string "Login"
+	string "Login page"
 	default "/login.cgi"
 	help
 		Login page to which user is redirected when not logged in
@@ -132,9 +126,9 @@ menu "CGI Wrapper"
 
     config FORM_SECURITY
     	bool "Perform security checks on forms"
-	default n
+	default y
 	help
-		Checks and sets environment variables used to provide form security
+		Checks and sets environment variables used to provide form security (script has to check result)
 
     config FORM_SECURITY_AGE
     	int "How long a form remains value, in minutes"
@@ -252,14 +246,14 @@ menu "Environment"
 
     config ENV_FORM_SECURITY_NAME
     	string "Environment variable holding the field name to use for form security"
-	default "FORM_SECURITY_NAME"
+	default ""
 	depends on FORM_SECURITY
 	help
 		Use the content of this variable as the name for a hidden field in any form you make. Holds FORM_SECURITY_NAME
 
     config ENV_FORM_SECURITY_OK
     	string "Environment variable that is only set if the form security passed"
-	default "FORM_SECURITY_OK"
+	default "SECURITY_OK"
 	depends on FORM_SECURITY
 	help
 		If a form security check passed, this is set. Otherwise it is unset.
