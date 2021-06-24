@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <err.h>
 #include <sqllib.h>
+#include "envcgi.h"
 #include "dologout.h"
 
 const char *dologout(SQL * sqlp, const char *session)
@@ -29,7 +30,7 @@ const char *dologout(SQL * sqlp, const char *session)
       return "No database";
    sql_safe_select_db(sqlp, v);
 #endif
-#ifdef	DB_SEPARATE_SESSION
+#ifdef	CONFIG_DB_SEPARATE_SESSION
    sql_safe_query_free(sqlp, sql_printf("DELETE FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_FIELD, session));
 #else
    sql_safe_query_free(sqlp, sql_printf("UPDATE `%#S` SET `%#S`=NULL WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_SESSION_FIELD, CONFIG_DB_SESSION_FIELD, session));
@@ -45,14 +46,18 @@ int main(int argc, const char *argv[])
 #ifdef  CONFIG_DB_DEBUG
    sqldebug = 1;
 #endif
+   int silent = 0;
+   int redirect = 0;
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
+         { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
+         { "redirect", 't', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
+         { "debug", 'v', POPT_ARG_NONE, &sqldebug, 0, "Debug", NULL },
          POPT_AUTOHELP { }
       };
 
       optCon = poptGetContext(NULL, argc, argv, optionsTable, 0);
-      //poptSetOtherOptionHelp (optCon, "");
 
       int c;
       if ((c = poptGetNextOpt(optCon)) < -1)
@@ -65,7 +70,19 @@ int main(int argc, const char *argv[])
       }
       poptFreeContext(optCon);
    }
-
+   const char *session = NULL;
+   if (*CONFIG_ENV_SESSION)
+      session = getenv(CONFIG_ENV_SESSION);
+   SQL sql;
+   sql_cnf_connect(&sql, CONFIG_DB_CONF);
+   const char *fail = dologout(&sql, session);
+   sql_close(&sql);
+   if (redirect)
+      sendredirect(NULL, fail?:"Logged out");
+   else if (fail)
+      printf("%s", fail);
+   if (fail)
+      return 1;
    return 0;
 }
 #endif
