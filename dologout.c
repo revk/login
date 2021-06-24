@@ -78,7 +78,7 @@ int main(int argc, const char *argv[])
    const char *fail = dologout(&sql, session);
    sql_close(&sql);
    if (redirect)
-      sendredirect(NULL, fail?:"Logged out");
+      sendredirect(NULL, fail ? : "Logged out");
    else if (fail)
       printf("%s", fail);
    if (fail)

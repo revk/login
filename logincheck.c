@@ -60,22 +60,73 @@ const char *logincheck(const char *session)
    const char *fail = check();
    if (res)
       sql_free_result(res);
-#ifdef	CONFIG_HTTP_AUTH
    if (fail)
-   {
-      const char *auth = getenv("HTTP_AUTHORIZATION");
-      if (auth && *auth)
+   {                            // Failed, check http auth (always done as envcgi controls if allowed or not)
+      char *auth = getenv("HTTP_AUTHORIZATION");
+      warnx("auth %s", auth);
+      if (auth && !strncasecmp(auth, "Basic ", 6))
       {                         // We have basic auth, decode base64 for username and password
+         auth += 6;
+         while (*auth == ' ')
+            auth++;
          if (!getenv("HTTPS"))
             fail = "Must use https - your password may now be compromised";
          else
          {
-
-            warnx("auth %s", auth);
+            auth = strdup(auth);
+            size_t v = 0,
+                b = 0,
+                i = 0,
+                o = 0;
+            while (auth[i])
+            {
+               char *q = strchr(BASE64, auth[i] == ' ' ? '+' : auth[i]);        // Note that + changes to space if used raw in a URL
+               if (!q)
+                  break;
+               i++;
+               b += 6;
+               v = (v << 6) + (q - BASE64);
+               while (b >= 8)
+               {
+                  b -= 8;
+                  auth[o++] = (v >> b);
+               }
+            }
+            auth[o] = 0;
+            char *pass = strchr(auth, ':');
+            if (pass)
+            {
+               *pass++ = 0;
+               warnx("user %s pass %s", auth, pass);
+               // Find the user
+               SQL_RES *res = sql_safe_query_store_free(&sql, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USERNAME_FIELD, auth));
+               if (!sql_fetch_row(res))
+                  fail = "Login failed.";
+               else
+               {
+                  const char *hash = NULL;
+                  if (*CONFIG_DB_PASSWORD_FIELD)
+                     hash = sql_col(res, CONFIG_DB_PASSWORD_FIELD);
+                  char *newhash = password_check(hash, pass);
+                  if (newhash && newhash != hash)
+                  {             // Login OK but hash needs updating
+#ifdef CONFIG_PASSWORD_UPDATE
+                     warnx("Hash update for user %s", auth);
+                     sql_safe_query_free(&sql, sql_printf("UPDATE `%#S` SET `%#S`=%#s WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_PASSWORD_FIELD, newhash, CONFIG_DB_USERNAME_FIELD, auth));
+#endif
+                     free(newhash);
+                  }
+                  if (newhash)
+                     fail = NULL; // Yay...
+                  else
+                     fail = "Login failed";
+               }
+               sql_free_result(res);
+            }
+            free(auth);
          }
       }
    }
-#endif
    sql_close(&sql);
    return fail;
 }

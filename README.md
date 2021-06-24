@@ -35,6 +35,7 @@ Normally these wrappers are followed by the shell you are using, but you can add
 - `--no-options`	Don't answer OPTIONS, allows the cgi to handle them
 - `--no-nocache`	Don't send a no-cache header. Normally this is automatically sent
 - `--no-http-auth` Don't allow HTTP authorization (unsets the header)
+- `--http-auth` Allow HTTP authorization, else if not generally allowed this unsets the header.
 - `--all-file`	Treat all fields as if they were a file post
 
 ## Tools

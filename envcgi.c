@@ -26,7 +26,6 @@
 #include <sys/time.h>
 #include <time.h>
 #include <syslog.h>
-#include <execinfo.h>
 #include <openssl/sha.h>
 #include "envcgi.h"
 #include "errorwrap.h"
@@ -38,7 +37,7 @@
 #define QUOTE(x) Q(x)
 
 #ifdef	CONFIG_FORM_SECURITY
-static const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 #endif
 
 char *q;
@@ -348,6 +347,11 @@ int main(int argc, char *argv[])
    int nopost = 0;
    int nonocache = 0;
    int allfile = 0;
+#ifdef	CONFIG_HTTP_AUTH
+   int httpauth = 1;            // Default allow
+#else
+   int httpauth = 0;            // Default don't allow
+#endif
    while (argc > 1)
    {
 #ifdef EXTRAARG1
@@ -374,7 +378,7 @@ int main(int argc, char *argv[])
          if (argv[1][2 + l] == ' ')
             argv[1] += 2 + l + 1;       // Next arg in space separated
          else
-         { // Next arg as arg list not spaces
+         {                      // Next arg as arg list not spaces
             argc--;
             argv++;
          }
@@ -391,10 +395,14 @@ int main(int argc, char *argv[])
       else if (check("no-nocache"))
          nonocache++;
       else if (check("no-http-auth"))
-         unsetenv("HTTP_AUTHORIZATION");
+         httpauth = 0;
+      else if (check("http-auth"))
+         httpauth = 1;
       else
          break;
    }
+   if (!httpauth)
+      unsetenv("HTTP_AUTHORIZATION");
 
    {                            // Forwarder logic
       char *i = getenv("REMOTE_ADDR");
