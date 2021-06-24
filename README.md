@@ -75,3 +75,7 @@ The session expiry is a configurable setting and can be set never to expire if y
 ## Library
 
 Library versions of `dologin`, `dologout`, `logincheck`, `password`, `changepassword` are provided to link in to your own code.
+
+## Housekeeping
+
+If using a session table with expiry you may want to put a key on the expiry and periodically delete expired sessions.
