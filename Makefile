@@ -73,12 +73,10 @@ selectdb.o: selectdb.c selectdb.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 menuconfig:
-	touch ${KCONFIG_CONFIG}
-	KCONFIG_CONFIG=${KCONFIG_CONFIG} kconfig-mconf Kconfig
+	./makek ${KCONFIG_CONFIG} config.h
+
+config.h: Kconfig
+	./makek ${KCONFIG_CONFIG} $@
 
 ${KCONFIG_CONFIG}: Kconfig
-	touch ${KCONFIG_CONFIG}
-	KCONFIG_CONFIG=${KCONFIG_CONFIG} kconfig-mconf Kconfig
-
-config.h: ${KCONFIG_CONFIG}
-	sed -e 's/^#/\/\//' -e 's/^CONFIG_/#define CONFIG_/' -e 's/=/ /' $< > $@
+	./makek ${KCONFIG_CONFIG} $@

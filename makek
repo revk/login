@@ -1,0 +1,6 @@
+#!/bin/csh -f
+setenv KCONFIG_CONFIG "$1"
+if(! -e "$KCONFIG_CONFIG" && -e "$KCONFIG_CONFIG".defaults) cp "$KCONFIG_CONFIG".defaults "$KCONFIG_CONFIG"
+touch "$KCONFIG_CONFIG"
+kconfig-mconf Kconfig
+sed -e 's/^#/\/\//' -e 's/^CONFIG_/#define CONFIG_/' -e 's/=/ /' "$KCONFIG_CONFIG" > "$2"
