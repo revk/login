@@ -85,7 +85,7 @@ menu "Database"
 
     config DB_SESSION_AGENT
     	string "Field name in session table for browser user agent"
-	default "loginip"
+	default "useragent"
 	depends on DB_SEPARATE_SESSION
 	help
 		Field name for logged in browser user agent - updated if it changes...
