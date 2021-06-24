@@ -28,6 +28,15 @@ If logged in then a number of extra environment variables are set. You need to a
 
 Obviously these also pass any form data as environment variables in the same way as `envcgi`.
 
+Normally these wrappers are followed by the shell you are using, but you can add some additional arguments before the shell...
+
+- `--no-cookie`	Don't set the session cookie
+- `--no-post`	Don't process POST, allows the cgi to process the posted data if needed
+- `--no-options`	Don't answer OPTIONS, allows the cgi to handle them
+- `--no-nocache`	Don't send a no-cache header. Normally this is automatically sent
+- `--no-http-auth` Don't allow HTTP authorization (unsets the header)
+- `--all-file`	Treat all fields as if they were a file post
+
 ## Tools
 
 There are also tools that the scripts can use.

@@ -367,57 +367,32 @@ int main(int argc, char *argv[])
          }
       }
 #endif
-      if (!strncmp(argv[1], "--all-file", 10))
-      {
-         if (argv[1][10] == ' ')
-            argv[1] += 11;
+      int check(const char *s) {
+         int l = strlen(s);
+         if (strncmp(argv[1], "--", 2) || strncmp(argv[1] + 2, s, l))
+            return 0;
+         if (argv[1][2 + l] == ' ')
+            argv[1] += 2 + l + 1;       // Next arg in space separated
          else
-         {
+         { // Next arg as arg list not spaces
             argc--;
             argv++;
          }
+         return 1;
+      }
+      if (check("all-file"))
          allfile++;
-      } else if (!strncmp(argv[1], "--no-cookie", 11))
-      {
-         if (argv[1][11] == ' ')
-            argv[1] += 12;
-         else
-         {
-            argc--;
-            argv++;
-         }
+      else if (check("no-cookie"))
          nocookie++;
-      } else if (!strncmp(argv[1], "--no-options", 12))
-      {
-         if (argv[1][12] == ' ')
-            argv[1] += 13;
-         else
-         {
-            argc--;
-            argv++;
-         }
+      else if (check("no-options"))
          nooptions++;
-      } else if (!strncmp(argv[1], "--no-post", 9))
-      {
-         if (argv[1][9] == ' ')
-            argv[1] += 10;
-         else
-         {
-            argc--;
-            argv++;
-         }
+      else if (check("no-post"))
          nopost++;
-      } else if (!strncmp(argv[1], "--no-nocache", 9))
-      {
-         if (argv[1][9] == ' ')
-            argv[1] += 10;
-         else
-         {
-            argc--;
-            argv++;
-         }
+      else if (check("no-nocache"))
          nonocache++;
-      } else
+      else if (check("no-http-auth"))
+         unsetenv("HTTP_AUTHORIZATION");
+      else
          break;
    }
 
@@ -803,7 +778,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   if (*CONFIG_SESSION_COOKIE)
+   if (*CONFIG_SESSION_COOKIE && !nocookie)
    {
       if (!session || !*session)
       {                         // Allocate a cookie

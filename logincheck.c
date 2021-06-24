@@ -60,6 +60,22 @@ const char *logincheck(const char *session)
    const char *fail = check();
    if (res)
       sql_free_result(res);
+#ifdef	CONFIG_HTTP_AUTH
+   if (fail)
+   {
+      const char *auth = getenv("HTTP_AUTHORIZATION");
+      if (auth && *auth)
+      {                         // We have basic auth, decode base64 for username and password
+         if (!getenv("HTTPS"))
+            fail = "Must use https - your password may now be compromised";
+         else
+         {
+
+            warnx("auth %s", auth);
+         }
+      }
+   }
+#endif
    sql_close(&sql);
    return fail;
 }

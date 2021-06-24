@@ -155,6 +155,12 @@ menu "CGI Wrapper"
 	help
 		Force a specific PATH for CGI scripts
 
+    config HTTP_AUTH
+    	bool "Allow http authorisation"
+	default n
+	help
+		Allow http authorisation page by page login, e.g. for use with curl
+
 endmenu
 
 menu "Environment"
