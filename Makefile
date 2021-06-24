@@ -11,6 +11,8 @@ SQLLIB=$(shell mariadb_config --libs)
 SQLVER=$(shell mariadb_config --version | sed 'sx\..*xx')
 endif
 
+KCONFIG_CONFIG=../login.conf
+
 COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC}
 LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 
@@ -69,12 +71,12 @@ selectdb.o: selectdb.c selectdb.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 menuconfig:
+	touch ${KCONFIG_CONFIG}
 	kconfig-mconf Kconfig
-	touch .config
 
-.config: Kconfig
+${KCONFIG_CONFIG}: Kconfig
+	touch ${KCONFIG_CONFIG}
 	kconfig-mconf Kconfig
-	touch .config
 
-config.h: .config
+config.h: ${KCONFIG_CONFIG}
 	sed -e 's/^#/\/\//' -e 's/^CONFIG_/#define CONFIG_/' -e 's/=/ /' $< > $@
