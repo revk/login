@@ -74,4 +74,4 @@ The session expiry is a configurable setting and can be set never to expire if y
 
 ## Library
 
-Library versions of `login`, `logout`, `logincheck`, `password`, `changepassword` are provided to link in to your own code.
+Library versions of `dologin`, `dologout`, `logincheck`, `password`, `changepassword` are provided to link in to your own code.
