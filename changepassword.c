@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <err.h>
 #include <sqllib.h>
+#include "selectdb.h"
 #include "hashes.h"
 #include "logincheck.h"
 #include "changepassword.h"
@@ -24,15 +25,7 @@ const char *changepassword(SQL * sqlp, const char *session, const char *oldpassw
       return "No old password";
    if (!newpassword || !*newpassword)
       return "No new password";
-#ifdef CONFIG_DB_DATABASE
-   if (*CONFIG_DB_DATABASE)
-      sql_safe_select_db(sqlp, CONFIG_DB_DATABASE);
-#else
-   const char *v;
-   if (*CONFIG_ENV_DB && !(v = getenv(CONFIG_ENV_DB)) || !*v)
-      return "No database";
-   sql_safe_select_db(sqlp, v);
-#endif
+   selectdb(sqlp);
    SQL_RES *res = find_session(sqlp, session);
    if (!res)
       return "Not logged in";
@@ -62,6 +55,7 @@ int main(int argc, const char *argv[])
 #endif
    int silent = 0;
    const char *session = NULL;
+   const char *username = NULL;
    const char *oldpassword = NULL;
    const char *newpassword = NULL;
    {                            // POPT
@@ -69,6 +63,7 @@ int main(int argc, const char *argv[])
       const struct poptOption optionsTable[] = {
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
          { "session", 0, POPT_ARG_STRING, &session, 0, "Session", "session" },
+         { "username", 0, POPT_ARG_STRING, &username, 0, "Username (use instead of session and old password)", "username" },
          { "old-password", 0, POPT_ARG_STRING, &oldpassword, 0, "Old password", "password" },
          { "new-password", 0, POPT_ARG_STRING, &newpassword, 0, "New password", "password" },
          { "debug", 'v', POPT_ARG_NONE, &sqldebug, 0, "Debug", NULL },
@@ -89,15 +84,38 @@ int main(int argc, const char *argv[])
       }
       poptFreeContext(optCon);
    }
-   if (!session && *CONFIG_ENV_SESSION)
-      session = getenv(CONFIG_ENV_SESSION);
-   if (!oldpassword && *CONFIG_ENV_OLD_PASSWORD)
-      oldpassword = getenv(CONFIG_ENV_OLD_PASSWORD);
-   if (!newpassword && *CONFIG_ENV_NEW_PASSWORD)
-      newpassword = getenv(CONFIG_ENV_NEW_PASSWORD);
    SQL sql;
    sql_cnf_connect(&sql, CONFIG_DB_CONF);
-   const char *fail = changepassword(&sql, session, oldpassword, newpassword);
+   const char *fail = NULL;
+   if (username)
+   {                            // Fixed setting password
+      if (session)
+         errx(1, "Use --username to force a new password, not based on session");
+      if (oldpassword)
+         errx(1, "User --username to force a new password, not based on old password");
+      if (!newpassword)
+         errx(1, "Specify the --new-password to set");
+      if (!*newpassword)
+         fail = "Blank passwords are not supported";
+      else
+      {
+	 selectdb(&sql);
+         char *newhash = password_hash(newpassword);
+         sql_safe_query_free(&sql, sql_printf("UPDATE `%#S` SET `%#S`=%#s WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_PASSWORD_FIELD, newhash, CONFIG_DB_USERNAME_FIELD, username));
+         free(newhash);
+         if (!sql_affected_rows(&sql))
+            fail = "User not found";
+      }
+   } else
+   {                            // Change logged in user
+      if (!session && *CONFIG_ENV_SESSION)
+         session = getenv(CONFIG_ENV_SESSION);
+      if (!oldpassword && *CONFIG_ENV_OLD_PASSWORD)
+         oldpassword = getenv(CONFIG_ENV_OLD_PASSWORD);
+      if (!newpassword && *CONFIG_ENV_NEW_PASSWORD)
+         newpassword = getenv(CONFIG_ENV_NEW_PASSWORD);
+      fail = changepassword(&sql, session, oldpassword, newpassword);
+   }
    if (fail && !silent)
       printf("%s", fail);
    sql_close(&sql);

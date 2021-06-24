@@ -12,9 +12,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <err.h>
-#include <sqllib.h>
 #include <argon2.h>
-#include "envcgi.h"
+#include <sqllib.h>
+#include "selectdb.h"
+#include "redirect.h"
 #include "hashes.h"
 #include "dologin.h"
 
@@ -30,15 +31,7 @@ const char *dologin(SQL * sqlp, const char *session, const char *username, const
       return "No password";
    if (!session || !*session)
       return "No session";
-#ifdef CONFIG_DB_DATABASE
-   if (*CONFIG_DB_DATABASE)
-      sql_safe_select_db(sqlp, CONFIG_DB_DATABASE);
-#else
-   if (*CONFIG_ENV_DB && !(v = getenv(CONFIG_ENV_DB)) || !*v)
-      return "No database";
-   sql_safe_select_db(sqlp, v);
-#endif
-
+   selectdb(sqlp);
    // Find the user
    SQL_RES *res = sql_safe_query_store_free(sqlp, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USERNAME_FIELD, username));
    if (!sql_fetch_row(res))

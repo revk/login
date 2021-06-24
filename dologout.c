@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <err.h>
 #include <sqllib.h>
+#include "selectdb.h"
 #include "envcgi.h"
 #include "dologout.h"
 
@@ -21,15 +22,7 @@ const char *dologout(SQL * sqlp, const char *session)
       return "No session";
    if (!session || !*session)
       return "No session";
-#ifdef CONFIG_DB_DATABASE
-   if (*CONFIG_DB_DATABASE)
-      sql_safe_select_db(sqlp, CONFIG_DB_DATABASE);
-#else
-   const char *v;
-   if (*CONFIG_ENV_DB && !(v = getenv(CONFIG_ENV_DB)) || !*v)
-      return "No database";
-   sql_safe_select_db(sqlp, v);
-#endif
+   selectdb(sqlp);
 #ifdef	CONFIG_DB_SEPARATE_SESSION
    sql_safe_query_free(sqlp, sql_printf("DELETE FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_FIELD, session));
 #else

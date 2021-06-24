@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <err.h>
 #include <sqllib.h>
+#include "selectdb.h"
 #include "envcgi.h"
 #include "dologin.h"
 #include "hashes.h"
@@ -57,15 +58,7 @@ const char *logincheck(const char *session)
    // Check login
    SQL sql;
    sql_cnf_connect(&sql, CONFIG_DB_CONF);
-#ifdef CONFIG_DB_DATABASE
-   if (*CONFIG_DB_DATABASE)
-      sql_safe_select_db(&sql, CONFIG_DB_DATABASE);
-#else
-   const char *v;
-   if (*CONFIG_ENV_DB && !(v = getenv(CONFIG_ENV_DB)) || !*v)
-      return "No database";
-   sql_safe_select_db(&sql, v);
-#endif
+   selectdb(&sql);
    SQL_RES *res = find_session(&sql, session);
    loginenv(res);
    const char *fail = NULL;

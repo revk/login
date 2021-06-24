@@ -1,0 +1,2 @@
+void selectdb(SQL * sqlp);
+
