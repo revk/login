@@ -1,2 +1,2 @@
 
-const char * password(int min, int max, int entropy);
+const char *password(int min, int max, int entropy);

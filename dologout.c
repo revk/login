@@ -33,8 +33,8 @@ const char *dologout(SQL * sqlp, const char *session)
 #ifndef LIB
 int main(int argc, const char *argv[])
 {
-	#ifdef  CONFIG_DB_DEBUG
-        sqldebug=1;
+#ifdef  CONFIG_DB_DEBUG
+   sqldebug = 1;
 #endif
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options

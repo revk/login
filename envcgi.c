@@ -46,10 +46,10 @@ char post = 0;
 int peek = 0;
 
 #ifdef PLUGIN
-const char* PLUGIN(const char *);
+const char *PLUGIN(const char *);
 #endif
 
-void sendredirect(const char *page,const char *fail)
+void sendredirect(const char *page, const char *fail)
 {
    const char *v;
    printf("Location: ");
@@ -67,7 +67,7 @@ void sendredirect(const char *page,const char *fail)
    if (back && !strcmp(back, CONFIG_PAGE_LOGIN))
       back = NULL;
    if (!page)
-      page = (fail?CONFIG_PAGE_LOGIN:back?:CONFIG_PAGE_HOME);
+      page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
    v = page;
    if (*v == '/')
       v++;
@@ -899,8 +899,8 @@ int main(int argc, char *argv[])
 #else
    if (er)
    {                            // Direct to login page
-      sendredirect(NULL,er);
-      return 1;                // Failed
+      sendredirect(NULL, er);
+      return 1;                 // Failed
    }
 #endif
 #endif

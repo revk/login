@@ -1,3 +1,3 @@
 // Logout
 
-const char *dologout(SQL*,const char *session);
+const char *dologout(SQL *, const char *session);
