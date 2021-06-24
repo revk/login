@@ -157,7 +157,6 @@ void loginenv(SQL_RES * res)
          uid = sql_col(res, CONFIG_DB_USERNAME_FIELD);
       setenv(CONFIG_ENV_USER_ID, uid, 1);
    }
-
-
+   // TODO
 
 }

@@ -21,7 +21,7 @@ void sendredirect(const char *page, const char *fail)
    const char *back = NULL;
    if (*CONFIG_ENV_BACK)
       back = getenv(CONFIG_ENV_BACK);
-   if (!back)
+   if (!back && fail)
       back = getenv("REQUEST_URI");
    if (back && !strcmp(back, CONFIG_PAGE_LOGIN))
       back = NULL;
