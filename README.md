@@ -16,18 +16,6 @@ The easiest way to understand this is try it, printing the environment when you 
 
 The wrapper can also perform form security checks - providing an environment variable to include in a form that is then checked when the form is received.
 
-## Logged in wrapper
-
-There are variations of `envcgi` for login handling. These are `loggedin` and `logincheck` and used in the same way, e.g. `#!../login/loggedin /bin/csh`
-
-The `loggedin` tool will not run the script if not logged in, but instead redirect to the configured login page.
-
-The `logincheck` tool will run the script even if not logged in.
-
-If logged in then a number of extra environment variables are set. You need to avoid these variables in forms you use, obviously, to avoid clashes. The actual variables set are configurable in the build. One variable is the unique user ID from your user table, usually `$USER_ID` which is explicitly *unset* if you are not logged in, and so can be used to check if login worked or not.
-
-Obviously these also pass any form data as environment variables in the same way as `envcgi`.
-
 Normally these wrappers are followed by the shell you are using, but you can add some additional arguments before the shell...
 
 - `--no-cookie`	Don't set the session cookie
@@ -37,6 +25,18 @@ Normally these wrappers are followed by the shell you are using, but you can add
 - `--no-http-auth` Don't allow HTTP authorization (unsets the header)
 - `--http-auth` Allow HTTP authorization, else if not generally allowed this unsets the header.
 - `--all-file`	Treat all fields as if they were a file post
+
+## Logged in wrapper
+
+There are variations of `envcgi` for login handling. These are `loggedin` and `logincheck` and used in the same way, e.g. `#!../login/loggedin /bin/csh`
+
+The `loggedin` tool will not run the script if not logged in, but instead redirect to the configured login page.
+
+The `logincheck` tool will run the script even if not logged in.
+
+If logged in then a number of extra environment variables are set. You need to avoid these variables in forms you use, obviously, to avoid clashes. The way this is usually done is to use lower case for form fields and upper case for any special variables. The actual variables set are configurable in the build. One variable is the unique user ID from your user table, usually `$USER_ID` which is explicitly *unset* if you are not logged in, and so can be used to check if login worked or not.
+
+Obviously these also pass any form data as environment variables in the same way as `envcgi`.
 
 ## Tools
 
