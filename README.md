@@ -40,9 +40,9 @@ Obviously these also pass any form data as environment variables in the same way
 
 ## Tools
 
-There are also tools that the scripts can use.
+There are also tools that the scripts can use. *Note that most of these will write any error reason to stdout unless using `--silent` so you should capture output to avoid apache errors.*
 
-`dologin` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a login. Normally this is `$USERNAME` and `$PASSWORD` but the fields can be configured. It returns a status 0 if the login worked. **This writes to stdout with error reason if login fails, so should be caputured, or use `--silent`**
+`dologin` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a login. Normally this is `$USERNAME` and `$PASSWORD` but the fields can be configured or passed as arguments. It returns a status 0 if the login worked.
 
 Note that `dologin --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to home or login page with error based on login result.
 
@@ -50,11 +50,11 @@ Note that `dologin --redirect` can be used directly from script wrapped under `l
 
 Note that `dologout --redirect` can be used directly from script wrapped under `logincheck` and it will redirect to login page.
 
-`changepassword` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a password change. Normally this is `$OLDPASSWORD` and `$NEWPASSWORD`. It returns a status 0 if the password was changed. You have to be logged in for this to work. **This writes to stdout with error reason if change fails, so should be caputured, or use `--silent`**
+`changepassword` will take environment variables (i.e. set by `envcgi` or `logincheck`) and perform a password change. Normally this is `$OLDPASSWORD` and `$NEWPASSWORD`. It returns a status 0 if the password was changed. You have to be logged in for this to work.
 
 `password` suggests a random password. There are arguments for length, entropy, etc, but these are usually set by `menuconfig`.
 
-`weblink` lets you make a link to send in an email, and check the link later within a defined time frame - used for registering user or forgotten password, etc. See `--help` for more. `weblink --make=*value*` creates a code to email to a user. `weblink --check` checks the code and if value outputs the *value* only if the link is valid and within required number of hours. Typically *value* is a user ID or email address. `dologin --force` can be used to force a login for a session. You can use this logic for new users and password change requests...
+`weblink` lets you make a link to send in an email, and check the link later within a defined time frame - used for registering user or forgotten password, etc. See `--help` for more. `weblink --make=`*value* creates a code to email to a user. `weblink --check` checks the code and if value outputs the *value* only if the link is valid and within required number of hours. Typically *value* is a user ID or email address. `dologin --force` can be used to force a login for a session. You can use this logic for new users and password change requests. *Note the value is not encrypted so should not contain anything secret.*
 
 ## Passwords
 
