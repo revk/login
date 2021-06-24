@@ -72,6 +72,10 @@ int main(int argc, const char *argv[])
 
    if (makelink)
    {                            // make a link and print the link
+      if (*makelink == '$')
+         makelink = getenv(makelink);
+      if (!makelink)
+         errx(1, "No value");
       char *hash = makehash(0, makelink);
       if (silent)
          errx(1, "Why silent?");
