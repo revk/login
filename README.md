@@ -58,7 +58,7 @@ Note that `dologout --redirect` can be used directly from script wrapped under `
 
 ## Passwords
 
-The system stores passwords in a hash, usually in a `text` field called `pass` in a database. The system understands a number of password hash formats including mysql `password()` hashs. The supported hashes are configurable. When a user logs in correctly the password is updated if necessary to the latest password format used - currently `argon2`. This helps ensure you are using current best practice password hashes.
+The system stores passwords in a hash, usually in a `text` field called `hash` in a database. The system understands a number of password hash formats including mysql `password()` hashes. The supported hashes are configurable. When a user logs in correctly the password is updated if necessary to the latest password format used - currently `argon2`. This helps ensure you are using current best practice password hashes.
 
 ## OTP
 
