@@ -11,8 +11,6 @@ SQLLIB=$(shell mariadb_config --libs)
 SQLVER=$(shell mariadb_config --version | sed 'sx\..*xx')
 endif
 
-KCONFIG_CONFIG=../login.conf
-
 COMPFLAGS=-fPIC -g -O -ISQLlib -D_GNU_SOURCE --std=gnu99 -Wall -Wextra -funsigned-char ${SQLINC}
 LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 
