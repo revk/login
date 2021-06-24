@@ -45,8 +45,8 @@ logincheck: envcgi.c logincheck.o hashes.o redirect.o selectdb.o base64.o
 logincheck.o: logincheck.c config.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-dologin: dologin.c dologin.o hashes.o redirect.o selectdb.o
-	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o redirect.o -largon2 hashes.o selectdb.o
+dologin: dologin.c dologin.o hashes.o redirect.o selectdb.o logincheck.o base64.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o redirect.o -largon2 hashes.o selectdb.o logincheck.o base64.o
 
 dologin.o: dologin.c dologin.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

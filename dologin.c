@@ -17,6 +17,7 @@
 #include "selectdb.h"
 #include "redirect.h"
 #include "hashes.h"
+#include "logincheck.h"
 #include "dologin.h"
 
 const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQL_RES * res)
@@ -58,10 +59,6 @@ const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQ
    if (*CONFIG_DB_SESSION_TIME)
       sql_sprintf(&s, "`%#S`=NOW(),", CONFIG_DB_SESSION_TIME);
 #endif
-#ifdef CONFIG_DB_SESSION_IP
-   if (*CONFIG_DB_SESSION_IP)
-      sql_sprintf(&s, "`%#S`=%#s,", CONFIG_DB_SESSION_IP, getenv("REMOTE_ADDR"));
-#endif
    if (sql_back_s(&s) == ',')
    {
 #ifndef	CONFIG_DB_SEPARATE_SESSION
@@ -72,6 +69,7 @@ const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQ
       sql_free_s(&s);
    if (!sql_affected_rows(sqlp))
       return "Login failed";
+   logincheck(session); // Updates fields as needed
    return NULL;
 }
 
@@ -161,6 +159,7 @@ int main(int argc, const char *argv[])
    const char *fail = NULL;
    SQL sql;
    sql_cnf_connect(&sql, CONFIG_DB_CONF);
+   sql_transaction(&sql);
 #ifdef CONFIV_ENV_OTA
    if (!otp && *CONFIG_ENV_OTA)
       otp = getenv(CONFIG_ENV_OTA);
@@ -180,6 +179,7 @@ int main(int argc, const char *argv[])
          password = getenv(CONFIG_ENV_PASSWORD);
       fail = dologin(&sql, session, username, password, otp);
    }
+   sql_safe_commit(&sql);
    sql_close(&sql);
    if (redirect)
       sendredirect(NULL, fail);

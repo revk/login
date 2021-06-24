@@ -83,6 +83,13 @@ menu "Database"
 	help
 		Field name for logged in IP address varchar(39) - updated if it changes...
 
+    config DB_SESSION_AGENT
+    	string "Field name in session table for browser user agent"
+	default "loginip"
+	depends on DB_SEPARATE_SESSION
+	help
+		Field name for logged in browser user agent - updated if it changes...
+
     config DB_SESSION_EXPIRES
     	string "Field name in session table for expiry of current session"
 	default "expires"
