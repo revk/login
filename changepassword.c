@@ -21,7 +21,7 @@ const char *changepassword(SQL * sqlp, const char *session, const char *oldpassw
       return "No sql";
    if (!session || !*session)
       return "No session";
-   if (force && (!oldpassword || !*oldpassword))
+   if (!force && (!oldpassword || !*oldpassword))
       return "No old password";
    if (!newpassword || !*newpassword)
       return "No new password";
