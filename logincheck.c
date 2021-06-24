@@ -25,6 +25,24 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
    if (sql_fetch_row(res))
    {
       const char *uid = sql_col(res, CONFIG_DB_SESSION_USER_LINK);
+#ifdef CONFIG_DB_SESSION_EXPIRES
+      if (*CONFIG_DB_SESSION_EXPIRES)
+      {
+         time_t now = time(0);
+         time_t expires = sql_time(sql_colz(res, CONFIG_DB_SESSION_EXPIRES));
+         if (expires < now)
+         {
+            warnx("Session for %s expired", sql_col(res, CONFIG_DB_USERNAME_FIELD));
+            found = NULL;
+            uid = NULL;
+         } else
+         {
+            time_t end = now + 3600 * CONFIG_SESSION_EXPIRY;
+            if (expires < end - 1800)
+               sql_safe_query_free(sqlp, sql_printf("UPDATE `%#S` SET `%#S`=%#T WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_EXPIRES, end, CONFIG_DB_SESSION_FIELD, session));
+         }
+      }
+#endif
       if (uid)
       {
          sql_string_t s = { };
@@ -32,27 +50,7 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
          sql_free_result(res);
          res = sql_safe_query_store_s(sqlp, &s);
          if (sql_fetch_row(res))
-         {
             found = res;
-#ifdef CONFIG_DB_SESSION_EXPIRES
-            if (*CONFIG_DB_SESSION_EXPIRES)
-            {
-               time_t now = time(0);
-               time_t expires = sql_time(sql_colz(res, CONFIG_DB_SESSION_EXPIRES));
-               if (expires < now)
-               {
-                  warnx("Session for %s expired", sql_col(res, CONFIG_DB_USERNAME_FIELD));
-                  found = NULL;
-               } else
-               {
-                  time_t end = now + 3600 * CONFIG_SESSION_EXPIRY;
-                  if (expires < end - 1800)
-                     sql_safe_query_free(sqlp, sql_printf("UPDATE `%#S` SET `%#S`=%#T WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_EXPIRES, end, CONFIG_DB_SESSION_FIELD, session));
-               }
-            }
-#endif
-         }
-
       }
    }
 #else
