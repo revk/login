@@ -1,2 +1,1 @@
 void selectdb(SQL * sqlp);
-

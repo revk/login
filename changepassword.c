@@ -15,13 +15,13 @@
 #include "logincheck.h"
 #include "changepassword.h"
 
-const char *changepassword(SQL * sqlp, const char *session, const char *oldpassword, const char *newpassword)
+const char *changepassword(SQL * sqlp, const char *session, const char *oldpassword, const char *newpassword, int force)
 {
    if (!sqlp)
       return "No sql";
    if (!session || !*session)
       return "No session";
-   if (!oldpassword || !*oldpassword)
+   if (force && (!oldpassword || !*oldpassword))
       return "No old password";
    if (!newpassword || !*newpassword)
       return "No new password";
@@ -29,18 +29,21 @@ const char *changepassword(SQL * sqlp, const char *session, const char *oldpassw
    SQL_RES *res = find_session(sqlp, session);
    if (!res)
       return "Not logged in";
-   const char *hash = NULL;
-   if (*CONFIG_DB_PASSWORD_FIELD)
-      hash = sql_col(res, CONFIG_DB_PASSWORD_FIELD);
-   char *newhash = password_check(hash, oldpassword);
-   if (newhash && newhash != hash)
-      free(newhash);            // Update, but we don't need to
-   if (!newhash)
+   if (!force)
    {
-      sql_free_result(res);
-      return "Wrong password";
+      const char *hash = NULL;
+      if (*CONFIG_DB_PASSWORD_FIELD)
+         hash = sql_col(res, CONFIG_DB_PASSWORD_FIELD);
+      char *newhash = password_check(hash, oldpassword);
+      if (newhash && newhash != hash)
+         free(newhash);         // Update, but we don't need to
+      if (!newhash)
+      {
+         sql_free_result(res);
+         return "Wrong password";
+      }
    }
-   newhash = password_hash(newpassword);
+   char *newhash = password_hash(newpassword);
    sql_safe_query_free(sqlp, sql_printf("UPDATE `%#S` SET `%#S`=%#s WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_PASSWORD_FIELD, newhash, CONFIG_DB_USERNAME_FIELD, sql_col(res, CONFIG_DB_USERNAME_FIELD)));
    free(newhash);
    sql_free_result(res);
@@ -54,6 +57,7 @@ int main(int argc, const char *argv[])
    sqldebug = 1;
 #endif
    int silent = 0;
+   int force = 0;
    const char *session = NULL;
    const char *username = NULL;
    const char *oldpassword = NULL;
@@ -62,6 +66,7 @@ int main(int argc, const char *argv[])
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
+         { "force", 0, POPT_ARG_NONE, &force, 0, "Force change with no old password", NULL },
          { "session", 0, POPT_ARG_STRING, &session, 0, "Session", "session" },
          { "username", 0, POPT_ARG_STRING, &username, 0, "Username (use instead of session and old password)", "username" },
          { "old-password", 0, POPT_ARG_STRING, &oldpassword, 0, "Old password", "password" },
@@ -108,13 +113,15 @@ int main(int argc, const char *argv[])
       }
    } else
    {                            // Change logged in user
+      if (force && oldpassword)
+         errx(1, "You don't specify --old-password with --force");
       if (!session && *CONFIG_ENV_SESSION)
          session = getenv(CONFIG_ENV_SESSION);
       if (!oldpassword && *CONFIG_ENV_OLD_PASSWORD)
          oldpassword = getenv(CONFIG_ENV_OLD_PASSWORD);
       if (!newpassword && *CONFIG_ENV_NEW_PASSWORD)
          newpassword = getenv(CONFIG_ENV_NEW_PASSWORD);
-      fail = changepassword(&sql, session, oldpassword, newpassword);
+      fail = changepassword(&sql, session, oldpassword, newpassword, force);
    }
    if (fail && !silent)
       printf("%s", fail);
