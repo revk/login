@@ -1,4 +1,4 @@
-all:	password envcgi loggedin logincheck dologin dologout changepassword
+all:	password envcgi loggedin logincheck dologin dologout changepassword weblink
 
 ifneq ($(wildcard /usr/bin/mysql_config),)
 SQLINC=$(shell mysql_config --include)
@@ -16,6 +16,9 @@ LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 
 SQLlib/sqllib.o: SQLlib/sqllib.c
 	make -C SQLlib
+
+weblink: weblink.c base64.o password
+	gcc -o $@ $< ${LINKFLAGS} base64.o -lpopt -DSECRET=`./password`
 
 envcgi: envcgi.c envcgi.o errorwrap.o redirect.o base64.o password
 	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o base64.o -DSECRET=`./password`

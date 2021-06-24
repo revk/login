@@ -54,6 +54,8 @@ Note that `dologout --redirect` can be used directly from script wrapped under `
 
 `password` suggests a random password. There are arguments for length, entropy, etc, but these are usually set by `menuconfig`.
 
+`weblink` lets you make a link to send in an email, and check the link later within a defined time frame - used for registering user or forgotten password, etc. See `--help` for more.
+
 ## Passwords
 
 The system stores passwords in a hash, usually in a `text` field called `pass` in a database. The system understands a number of password hash formats including mysql `password()` hashs. The supported hashes are configurable. When a user logs in correctly the password is updated if necessary to the latest password format used - currently `argon2`. This helps ensure you are using current best practice password hashes.
