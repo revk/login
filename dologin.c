@@ -108,11 +108,17 @@ int main(int argc, const char *argv[])
 #endif
    int silent = 0;
    int redirect = 0;
+   const char *session = NULL;
+   const char *username = NULL;
+   const char *password = NULL;
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
          { "redirect", 't', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
+         { "session", 0, POPT_ARG_STRING, &session, 0, "Session", "session" },
+         { "username", 0, POPT_ARG_STRING, &username, 0, "Username", "username" },
+         { "password", 0, POPT_ARG_STRING, &password, 0, "Password", "password" },
          { "debug", 'v', POPT_ARG_NONE, &sqldebug, 0, "Debug", NULL },
          POPT_AUTOHELP { }
       };
@@ -130,14 +136,11 @@ int main(int argc, const char *argv[])
       }
       poptFreeContext(optCon);
    }
-   const char *session = NULL;
-   if (*CONFIG_ENV_SESSION)
+   if (!session && *CONFIG_ENV_SESSION)
       session = getenv(CONFIG_ENV_SESSION);
-   const char *username = NULL;
-   if (*CONFIG_ENV_USERNAME)
+   if (!username && *CONFIG_ENV_USERNAME)
       username = getenv(CONFIG_ENV_USERNAME);
-   const char *password = NULL;
-   if (*CONFIG_ENV_PASSWORD)
+   if (!password && *CONFIG_ENV_PASSWORD)
       password = getenv(CONFIG_ENV_PASSWORD);
    const char *otp = NULL;
 #ifdef CONFIV_ENV_OTA
@@ -150,7 +153,7 @@ int main(int argc, const char *argv[])
    sql_close(&sql);
    if (redirect)
       sendredirect(NULL, fail);
-   else if (fail)
+   else if (fail && !silent)
       printf("%s", fail);
    if (fail)
       return 1;

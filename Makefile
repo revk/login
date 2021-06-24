@@ -50,8 +50,8 @@ dologout: dologout.c dologout.o envcgi.o
 dologout.o: dologout.c dologout.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
-changepassword: changepassword.c changepassword.o
-	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o
+changepassword: changepassword.c changepassword.o logincheck.o hashes.o
+	gcc -o $@ $< ${LINKFLAGS} -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2
 
 changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

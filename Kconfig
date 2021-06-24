@@ -196,6 +196,18 @@ menu "Environment"
 	help
 		Field name to use in a form for password in login
 
+    config ENV_OLD_PASSWORD
+    	string "The environment variable for old password when changing password"
+	default "OLDPASSWORD"
+	help
+		Field name to use in a form for old password in change password
+
+    config ENV_NEW_PASSWORD
+    	string "The environment variable for new password when changing password"
+	default "NEWPASSWORD"
+	help
+		Field name to use in a form for new password in change password
+
     config ENV_BACK
 	string "Back link environment variable"
 	default "BACK"

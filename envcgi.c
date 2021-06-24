@@ -37,7 +37,7 @@
 #define QUOTE(x) Q(x)
 
 #ifdef	CONFIG_FORM_SECURITY
-const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 #endif
 
 char *q;

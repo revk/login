@@ -12,7 +12,39 @@
 #include <sqllib.h>
 #include "envcgi.h"
 #include "dologin.h"
+#include "hashes.h"
 #include "logincheck.h"
+
+static const char BASE64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+SQL_RES *find_session(SQL * sqlp, const char *session)
+{
+   SQL_RES *found = NULL;
+#ifdef CONFIG_DB_SEPARATE_SESSION
+   SQL_RES *res = sql_safe_query_store_free(sqlp, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_FIELD, session));
+   if (sql_fetch_row(res))
+   {
+      const char *uid = sql_col(res, CONFIG_DB_SESSION_USER_LINK);
+      if (uid)
+      {
+         sql_string_t s = { };
+         sql_sprintf(&s, "SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USER_ID_FIELD, uid);
+         sql_free_result(res);
+         res = sql_safe_query_store_s(sqlp, &s);
+         if (sql_fetch_row(res))
+            found = res;
+      }
+   }
+#else
+   SQL_RES *res = sql_safe_query_store_free(sqlp, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_SESSION_FIELD, session));
+   if (sql_fetch_row(res))
+      found = res;
+#endif
+   if (found)
+      return found;
+   sql_free_result(res);
+   return NULL;
+}
 
 const char *logincheck(const char *session)
 {                               // Do plugin checks after envcgi has set session and environment and so on - return 0 if OK
@@ -34,32 +66,13 @@ const char *logincheck(const char *session)
       return "No database";
    sql_safe_select_db(&sql, v);
 #endif
-   SQL_RES *res = NULL;
-   const char *check(void) {
-#ifdef CONFIG_DB_SEPARATE_SESSION
-      res = sql_safe_query_store_free(&sql, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_FIELD, session));
-      if (!sql_fetch_row(res))
-         return "Not logged in";
-      const char *uid = sql_col(res, CONFIG_DB_SESSION_USER_LINK);
-      if (!uid)
-         return "Bad session";
-      sql_string_t s = { };
-      sql_sprintf(&s, "SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USER_ID_FIELD, uid);
-      sql_free_result(res);
-      res = sql_safe_query_store_s(&sql, &s);
-      if (!sql_fetch_row(res))
-         return "No user";
-#else
-      res = sql_safe_query_store_free(&sql, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_SESSION_FIELD, session));
-      if (!sql_fetch_row(res))
-         return "Not logged in";
-#endif
-      loginenv(res);
-      return NULL;              // OK
-   }
-   const char *fail = check();
+   SQL_RES *res = find_session(&sql, session);
+   loginenv(res);
+   const char *fail = NULL;
    if (res)
       sql_free_result(res);
+   else
+      fail = "Not logged on";
    if (fail)
    {                            // Failed, check http auth (always done as envcgi controls if allowed or not)
       char *auth = getenv("HTTP_AUTHORIZATION");
@@ -117,7 +130,7 @@ const char *logincheck(const char *session)
                      free(newhash);
                   }
                   if (newhash)
-                     fail = NULL; // Yay...
+                     fail = NULL;       // Yay...
                   else
                      fail = "Login failed";
                }
