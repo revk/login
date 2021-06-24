@@ -83,6 +83,13 @@ menu "Database"
 	help
 		Field name for logged in IP address varchar(39) - updated if it changes...
 
+    config DB_SESSION_EXPIRES
+    	string "Field name in session table for expiry of current session"
+	default "expires"
+	depends on DB_SEPARATE_SESSION && SESSION_EXPIRY!=0
+	help
+		Fieldname of session exiries datetime, updated periodically not on every access
+
     config DB_DEBUG
     	bool "Turn on database debug"
 	default n
@@ -135,6 +142,12 @@ menu "CGI Wrapper"
 	default 60
 	help
 		Set how long the form remains valid (in minutes)
+
+    config WEBLINK_AGE
+    	int "How long a weblink remains active, in hours"
+	default 8
+	help
+		Default age for web link check, in hours.
 
     config FORM_SECURITY_TAG
     	string "The field name for form security (does not normally need changing)"

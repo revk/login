@@ -54,7 +54,7 @@ Note that `dologout --redirect` can be used directly from script wrapped under `
 
 `password` suggests a random password. There are arguments for length, entropy, etc, but these are usually set by `menuconfig`.
 
-`weblink` lets you make a link to send in an email, and check the link later within a defined time frame - used for registering user or forgotten password, etc. See `--help` for more.
+`weblink` lets you make a link to send in an email, and check the link later within a defined time frame - used for registering user or forgotten password, etc. See `--help` for more. `weblink --make=*value*` creates a code to email to a user. `weblink --check` checks the code and if value outputs the *value* only if the link is valid and within required number of hours. Typically *value* is a user ID or email address. `dologin --force` can be used to force a login for a session. You can use this logic for new users and password change requests...
 
 ## Passwords
 

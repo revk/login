@@ -1,5 +1,6 @@
 // Web link - make and check a web link
 
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include <popt.h>
@@ -20,7 +21,7 @@ int main(int argc, const char *argv[])
    const char *hash = "$QUERY_STRING";
    int checklink = 0;
    int silent = 0;
-   int hours = 2;
+   int hours = CONFIG_WEBLINK_AGE;
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
