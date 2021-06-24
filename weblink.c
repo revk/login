@@ -17,7 +17,7 @@
 int main(int argc, const char *argv[])
 {
    const char *makelink = NULL;
-   const char *hash = "$PATH_INFO";
+   const char *hash = "$QUERY_STRING";
    int checklink = 0;
    int silent = 0;
    int hours = 2;
@@ -83,7 +83,11 @@ int main(int argc, const char *argv[])
    if (checklink)
    {                            // Check a link and print the value
       if (*hash == '$')
+      {
          hash = getenv(hash + 1);
+         if (hash && *hash == '?')
+            hash++;
+      }
       if (!hash || !*hash)
          errx(1, "No link");
       unsigned char *block;
@@ -91,23 +95,24 @@ int main(int argc, const char *argv[])
       if (len < SHA_DIGEST_LENGTH)
          errx(1, "hash to short");
       char *value = (void *) block + SHA_DIGEST_LENGTH;
-      int h=0;
-      while (h<hours)
+      int h = 0;
+      while (h < hours)
       {
          char *try = makehash(h, value);
-	 warnx("Test %d %s %s %s",h,try,hash,value);
+         warnx("Test %d %s %s %s", h, try, hash, value);
          if (!strcmp(try, hash))
          {                      // Match
             free(try);
             break;
          }
          free(try);
-	 h++;
+         h++;
       }
-      if (h<hours&&!silent)
+      if (h < hours && !silent)
          printf("%s", value);
       free(block);
-      if(h<hours)return 0;
+      if (h < hours)
+         return 0;
       return 1;
    }
 
