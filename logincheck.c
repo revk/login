@@ -14,7 +14,6 @@
 #include "envcgi.h"
 #include "dologin.h"
 #include "hashes.h"
-#include "redirect.h"
 #include "base64.h"
 #include "logincheck.h"
 
@@ -137,11 +136,7 @@ const char *logincheck(const char *session)
    }
    sql_close(&sql);
    if (!fail && nopass)
-   {
       fail = "User has no password";
-      if (*CONFIG_PAGE_PASSWORD)
-         sendredirect(CONFIG_PAGE_PASSWORD, fail);
-   }
    return fail;
 }
 

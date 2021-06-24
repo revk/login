@@ -126,7 +126,7 @@ menu "CGI Wrapper"
 
     config PAGE_PASSWORD
 	string "Password page"
-	default "/changedpassword.cgi"
+	default "/changepassword.cgi"
 	help
 		Page to which user is redirected when logged in but with no password set (e.g. new user)
 
