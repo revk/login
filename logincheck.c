@@ -37,3 +37,14 @@ const char * logincheck(const char *session)
    sql_close(&sql);
    return NULL; // OK
 }
+
+void loginenv(SQL_RES*res)
+{ // Fill in login environment variables
+	if(!res)
+	{ // Not logged in
+		if(*CONFIG_ENV_USER_ID)unsetenv(CONFIG_ENV_USER_ID);
+		return;
+	}
+
+
+}

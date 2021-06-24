@@ -32,7 +32,7 @@ menu "Database"
 		The field name in user table for the user login name/email/etc
 
     config DB_PASSWORD_FIELD
-    	string "User password field"
+    	string "User password hash field"
 	default "pass"
 	help
 		The field name in user table for the password hash
@@ -67,13 +67,13 @@ menu "Database"
 	default "user"
 	depends on DB_SEPARATE_SESSION
 	help
-		Field name, probably foreign key, from session table to user
+		Field name, probably foreign key, from session table to user table user id primary key
 
-    config DB_USER_KEY_FIELD
+    config DB_USER_ID_FIELD
     	string "Field name in user table that is primary key linked from session table"
 	default "ID"
 	help
-		Field name of primary key in user table linked from session table
+		Field name of primary key in user table
 
     config DB_SESSION_TIME
     	string "Field name in session table for logged in time"
@@ -84,7 +84,7 @@ menu "Database"
 
     config DB_SESSION_IP
     	string "Field name in session table for logged in IP"
-	default "IP"
+	default "loginip"
 	depends on DB_SEPARATE_SESSION
 	help
 		Field name for logged in IP address varchar(39) - updated if it changes...

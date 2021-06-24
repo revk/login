@@ -24,7 +24,7 @@ The `loggedin` tool will not run the script if not logged in, but instead redire
 
 The `logincheck` tool will run the script even if not logged in.
 
-If logged in then a number of extra environment variables are set. These are unset if not logged in to avoid spoofing by sending form data. You need to avoid these variables in forms you use, obviously, to avoid clashes. The actual variables set are configurable in the build but typically you have `$LOGIN` for the username, and fields from a user database table like `$FULLNAME`, etc.
+If logged in then a number of extra environment variables are set. You need to avoid these variables in forms you use, obviously, to avoid clashes. The actual variables set are configurable in the build. One variable is the unique user ID from your user table, usually `$USER_ID` which is explicitly *unset* if you are not logged in, and so can be used to check if login worked or not.
 
 Obviously these also pass any form data as environment variables in the same way as `envcgi`.
 
