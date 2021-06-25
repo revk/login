@@ -95,7 +95,14 @@ menu "Database"
 	default "expires"
 	depends on DB_SEPARATE_SESSION && SESSION_EXPIRY!=0
 	help
-		Fieldname of session exiries datetime, updated periodically not on every access
+		Fieldname of session expires datetime, updated periodically not on every access
+
+    config DB_CLEANUP_SESSION
+    	bool "Clean up expired sessions"
+	default n
+	depends on DB_SEPARATE_SESSION && SESSION_EXPIRY!=0
+	help
+		Do a session clean when updating any expires
 
     config DB_DEBUG
     	bool "Turn on database debug"

@@ -27,7 +27,7 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
       const char *uid = sql_col(res, CONFIG_DB_SESSION_USER_LINK);
       // Update session
       sql_string_t s = { };
-      sql_sprintf(&s,"UPDATE `%#S` SET ", CONFIG_DB_SESSION_TABLE);
+      sql_sprintf(&s, "UPDATE `%#S` SET ", CONFIG_DB_SESSION_TABLE);
 #ifdef CONFIG_DB_SESSION_EXPIRES
       if (*CONFIG_DB_SESSION_EXPIRES)
       {
@@ -45,13 +45,15 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
             {
 
                sql_sprintf(&s, "`%#S`=%#T,", CONFIG_DB_SESSION_EXPIRES, end);
+#ifdef CONFIG_DB_CLEANUP_SESSION
                sql_safe_query_free(sqlp, sql_printf("DELETE FROM `%#S` WHERE `%#S`<%#T", CONFIG_DB_SESSION_TABLE, CONFIG_DB_SESSION_EXPIRES, now - 86400));     // cleanup
+#endif
             }
          }
       }
 #endif
-      const char *a=NULL,
-      *b=NULL;
+      const char *a = NULL,
+          *b = NULL;
 #ifdef CONFIG_DB_SESSION_IP
       if (*CONFIG_DB_SESSION_IP && (a = getenv("REMOTE_ADDR")) && (b = sql_colz(res, CONFIG_DB_SESSION_IP)) && strcmp(a, b))
          sql_sprintf(&s, "`%#S`=%#s,", CONFIG_DB_SESSION_IP, a);
