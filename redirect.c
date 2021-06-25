@@ -47,7 +47,7 @@ void sendredirect(const char *page, const char *fail)
          if (*val == ' ')
             putchar('+');
          else if (*val < ' ' || strchr(";?:@^=+$,/", *val))
-            printf("%%%02d", *val);
+            printf("%%%02X", *val);
          else
             putchar(*val);
          val++;
