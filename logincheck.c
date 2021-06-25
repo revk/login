@@ -187,6 +187,8 @@ void loginenv(SQL_RES * res)
       for (size_t n = 0; n < res->field_count; n++)
       {                         // Check fields
          const char *name = res->fields[n].name;
+         if (*CONFIG_DB_USERNAME_FIELD && !strcasecmp(name, CONFIG_DB_USERNAME_FIELD))
+            continue;           // ID field already done
          if (*CONFIG_DB_PASSWORD_FIELD && !strcasecmp(name, CONFIG_DB_PASSWORD_FIELD))
             continue;           // Never password field
          const char *value = res->current_row[n];
@@ -221,9 +223,9 @@ void loginenv(SQL_RES * res)
       }
    }
 #ifdef	CONFIG_ENV_USER_LOAD
-   load(CONFIG_ENV_FIELD_EXCLUDE, 0);
+   load(CONFIG_ENV_FIELD_EXCLUDE, 1);
 #else
-   load(CONFIG_ENV_FIELD_LIST, 1);
+   load(CONFIG_ENV_FIELD_LIST, 0);
 #endif
    // TODO
 }
