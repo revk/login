@@ -196,7 +196,7 @@ void loginenv(SQL_RES * res)
          const char *l = list;
          while (*l)
          {
-            if (!strncasecmp(l, name, len) && !(l[len] || l[len] == ','))
+            if (!strncasecmp(l, name, len) && (!l[len] || l[len] == ','))
                break;
             while (*l && *l != ',')
                l++;
