@@ -69,6 +69,12 @@ menu "Database"
 	help
 		Field name of primary key in user table
 
+    config DB_USER_NAME_FIELD
+    	string "Field name in user table that is users name"
+	default "name"
+	help
+		Field name of user name in user table
+
     config DB_SESSION_TIME
     	string "Field name in session table for logged in time"
 	default "logintime"
@@ -230,6 +236,12 @@ menu "Environment"
 	default "USER_ID"
 	help
 		Users unique ID from user table for logged in user
+
+    config ENV_USER_NAME
+    	string "Environment variable for logged in user name"
+	default "USER_NAME"
+	help
+		Users name from user table
 
     config ENV_USERNAME
     	string "The environment variable for username when logging in"
