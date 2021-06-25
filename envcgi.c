@@ -165,7 +165,7 @@ void store(char *var)
 }
 
 #ifdef	CONFIG_FORM_SECURITY
-int form_security(void)
+int form_security(const char *session)
 {                               // return 0 if not OK, else seconds old if OK
    int ret = 0;
    const char *secret = QUOTE(SECRET);
@@ -177,7 +177,9 @@ int form_security(void)
    {
       SHA_CTX c;
       SHA1_Init(&c);
-      SHA1_Update(&c, secret, strlen(secret) - 1);
+      SHA1_Update(&c, secret, strlen(secret));
+      if (session)
+         SHA1_Update(&c, session, strlen(session));
       SHA1_Update(&c, hash + SHA_DIGEST_LENGTH, sizeof(time_t));
       SHA1_Final(hash, &c);
       size_t q;
@@ -816,7 +818,7 @@ int main(int argc, char *argv[])
 
    const char *er = NULL;
 #ifdef	CONFIG_FORM_SECURITY
-   if (!form_security() && post && noinsecurepost)
+   if (!form_security(session) && post && noinsecurepost)
       er = "Form security error";
 #endif
    if (!er && post && nopost)
