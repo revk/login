@@ -816,7 +816,7 @@ int main(int argc, char *argv[])
 
    const char *er = NULL;
 #ifdef	CONFIG_FORM_SECURITY
-   if (post && !form_security() && noinsecurepost)
+   if (!form_security() && post && noinsecurepost)
       er = "Form security error";
 #endif
    if (!er && post && nopost)
