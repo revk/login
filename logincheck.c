@@ -227,5 +227,4 @@ void loginenv(SQL_RES * res)
 #else
    load(CONFIG_ENV_FIELD_LIST, 0);
 #endif
-   // TODO
 }
