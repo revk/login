@@ -214,6 +214,8 @@ int form_security(const char *session)
             SHA_CTX c;
             SHA1_Init(&c);
             SHA1_Update(&c, secret, strlen(secret) - 1);
+            if (session)
+               SHA1_Update(&c, session, strlen(session));
             SHA1_Update(&c, hash + SHA_DIGEST_LENGTH, sizeof(time_t));
             SHA1_Final(check, &c);
             if (!memcmp(check, hash, SHA_DIGEST_LENGTH))
