@@ -196,7 +196,8 @@ void loginenv(SQL_RES * res)
          {
             if (!strncasecmp(l, name, len) && !(l[len] || l[len] == ','))
                break;
-            while (*l && *l != ',');
+            while (*l && *l != ',')
+               l++;
             while (*l == ',' || *l == ' ')
                l++;
          }
@@ -208,11 +209,15 @@ void loginenv(SQL_RES * res)
          if (asprintf(&var, "%s%s", CONFIG_ENV_PREFIX, name) < 0)
             errx(1, "malloc");
 #ifdef CONFIG_ENV_UPPER_CASE
-	 for(char *v=var;*v;v++)if(isalpha(*v))*v=toupper(*v);
+         for (char *v = var; *v; v++)
+            if (isalpha(*v))
+               *v = toupper(*v);
 #endif
-	 if(!value)unsetenv(var);
-	 else setenv(var,value,1);
-	 free(var);
+         if (!value)
+            unsetenv(var);
+         else
+            setenv(var, value, 1);
+         free(var);
       }
    }
 #ifdef	CONFIG_ENV_USER_LOAD
