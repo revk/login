@@ -822,7 +822,7 @@ int main(int argc, char *argv[])
    if (!er && post && nopost)
       er = "POST not allowed";
    if (!er && !post && noquery && *(getenv("QUERY_STRING") ? : ""))
-      er = "GET not allowed";
+      er = "GET form data not allowed";
 #if defined(PLUGIN) && !defined(NONFATAL)
    if (!er)
       er = PLUGIN(session);     // Fatal so done before redirect/ fail
