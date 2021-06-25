@@ -18,13 +18,19 @@ The wrapper can also perform form security checks - providing an environment var
 
 Normally these wrappers are followed by the shell you are using, but you can add some additional arguments before the shell...
 
-- `--no-cookie`	Don't set the session cookie
-- `--no-post`	Don't process POST, allows the cgi to process the posted data if needed
+- `--no-cookie`		Don't set the session cookie
+- `--pass-post`		Don't process a POST, pass on to script (treated as a GET for other checks)
 - `--no-options`	Don't answer OPTIONS, allows the cgi to handle them
 - `--no-nocache`	Don't send a no-cache header. Normally this is automatically sent
-- `--no-http-auth` Don't allow HTTP authorization (unsets the header)
-- `--http-auth` Allow HTTP authorization, else if not generally allowed this unsets the header.
-- `--all-file`	Treat all fields as if they were a file post
+- `--no-http-auth`	Don't allow HTTP authorization (unsets the header)
+- `--http-auth`		Allow HTTP authorization, else if not generally allowed this unsets the header.
+- `--no-query`		Do not allow a GET with query string (default depends on config)
+- `--query`		Allow a GET with query string (default depends on config)
+- `--no-post`		Do not allow a POST (default depends on config)
+- `--post`		Allow a POST (default depends on config)
+- `--no-insecure-post`	Do not allow a POST which fails form security checks (default depends on config)
+- `--insecure-post`	Allow a POST which fails form security checks (default depends on config)
+- `--all-file`		Treat all fields as if they were a file post
 
 ## Logged in wrapper
 

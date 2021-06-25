@@ -160,8 +160,28 @@ menu "CGI Wrapper"
     config FORM_SECURITY_AGE
     	int "How long a form remains value, in minutes"
 	default 60
+	depends on FORM_SECURITY
 	help
 		Set how long the form remains valid (in minutes)
+
+    config FORM_SECURITY_POSTS
+    	bool "Do form security on all posts - redirect on failure"
+	default n
+	depends on FORM_SECURITY
+	help
+		Stops any POST without valid form security unless allowed on individual script
+
+    config BLOCK_GET
+    	bool "Block all GET operations by default (per script usage can allow these)
+	default n
+	help
+		Stops any GET unless set on individual script
+
+    config BLOCK_POST
+    	bool "Block all POST operations by default (per script usage can allow these)
+	default n
+	help
+		Stops any POST unless set on individual script
 
     config WEBLINK_AGE
     	int "How long a weblink remains active, in hours"

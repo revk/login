@@ -165,12 +165,11 @@ void store(char *var)
 }
 
 #ifdef	CONFIG_FORM_SECURITY
-void form_security(void)
-{
+int form_security(void)
+{                               // return 0 if not OK, else seconds old if OK
+   int ret = 0;
    const char *secret = QUOTE(SECRET);
    int age = 60 * CONFIG_FORM_SECURITY_AGE;
-   if (*CONFIG_ENV_FORM_SECURITY_OK)
-      unsetenv(CONFIG_ENV_FORM_SECURITY_OK);    // default is not OK
    // Make a security token
    unsigned char hash[SHA_DIGEST_LENGTH + sizeof(time_t)];
    time_t now = time(0);
@@ -216,12 +215,8 @@ void form_security(void)
             SHA1_Update(&c, hash + SHA_DIGEST_LENGTH, sizeof(time_t));
             SHA1_Final(check, &c);
             if (!memcmp(check, hash, SHA_DIGEST_LENGTH))
-            {
-               char temp[10];
-               sprintf(temp, "%d", (int) (now - when));
-               if (*CONFIG_ENV_FORM_SECURITY_OK)
-                  setenv(CONFIG_ENV_FORM_SECURITY_OK, temp, 1); // Indicate security OK (and how old)
-            } else
+               ret = ((int) (now - when) ? : 1);        // OK
+            else
                fprintf(stderr, "Bad security hash %s\n", form);
          } else
             fprintf(stderr, "Bad security time %d\n", (int) (now - when));
@@ -231,6 +226,18 @@ void form_security(void)
          free(newhash);
    }
    free(b64);
+   if (*CONFIG_ENV_FORM_SECURITY_OK)
+   {
+      if (ret)
+      {
+         char temp[10];
+         sprintf(temp, "%d", ret);
+         if (*CONFIG_ENV_FORM_SECURITY_OK)
+            setenv(CONFIG_ENV_FORM_SECURITY_OK, temp, 1);       // Indicate security OK (and how old)
+      }
+      unsetenv(CONFIG_ENV_FORM_SECURITY_OK);    // default is not OK
+   }
+   return ret;
 }
 #endif
 
@@ -248,7 +255,6 @@ int main(int argc, char *argv[])
 #endif
    int nocookie = 0;
    int nooptions = 0;
-   int nopost = 0;
    int nonocache = 0;
    int allfile = 0;
 #ifdef	CONFIG_HTTP_AUTH
@@ -256,6 +262,22 @@ int main(int argc, char *argv[])
 #else
    int httpauth = 0;            // Default don't allow
 #endif
+#ifdef	CONFIG_BLOCK_GET
+   int noquery = 1;
+#else
+   int noquery = 0;
+#endif
+#ifdef CONFIG_BLOCK_POST
+   int nopost = 1;
+#else
+   int nopost = 0;
+#endif
+#ifdef CONFIG_FORM_SECURITY_POSTS
+   int noinsecurepost = 1;
+#else
+   int noinsecurepost = 0;
+#endif
+   int passpost = 0;
    while (argc > 1)
    {
 #ifdef EXTRAARG1
@@ -290,18 +312,34 @@ int main(int argc, char *argv[])
       }
       if (check("all-file"))
          allfile++;
+      else if (check("pass-post"))
+         passpost = 1;
       else if (check("no-cookie"))
          nocookie++;
       else if (check("no-options"))
          nooptions++;
-      else if (check("no-post"))
-         nopost++;
       else if (check("no-nocache"))
          nonocache++;
       else if (check("no-http-auth"))
          httpauth = 0;
       else if (check("http-auth"))
          httpauth = 1;
+      else if (check("query"))
+         noquery = 0;
+      else if (check("no-query"))
+         noquery = 1;
+      else if (check("post"))
+         nopost = 0;
+      else if (check("no-post"))
+         nopost = 1;
+      else if (check("insecure-post"))
+         noinsecurepost = 0;
+      else if (check("no-insecure-post"))
+#ifdef	CONFIG_FORM_SECURITY
+         noinsecurepost = 1;
+#else
+         errx(1, "Built without security checks so cannot have --no-insecure-post");
+#endif
       else
          break;
    }
@@ -357,7 +395,7 @@ int main(int argc, char *argv[])
       printf("Allow: GET, POST, OPTIONS\r\n\r\n");
       return 0;                 // no content
    }
-   if (q && !strcasecmp(q, "POST") && !nopost)
+   if (q && !strcasecmp(q, "POST") && !passpost)
       post = 1;
 #ifdef DEBUG
    printf("Content-Type: text/plain\n\nDebugging\n\n");
@@ -772,25 +810,33 @@ int main(int argc, char *argv[])
       free(e);
       e = n;
    }
-#ifdef	CONFIG_FORM_SECURITY
-   form_security();
-#endif
-
 #ifdef DEBUG
    fflush(stdout);
 #endif
-#ifdef PLUGIN
-   const char *er = PLUGIN(session);
-#ifdef	NONFATAL
-   er = er;
-#else
+
+   const char *er = NULL;
+#ifdef	CONFIG_FORM_SECURITY
+   if (post && !form_security() && noinsecurepost)
+      er = "Form security error";
+#endif
+   if (!er && post && nopost)
+      er = "POST not allowed";
+   if (!er && !post && noquery && *(getenv("QUERY_STRING") ? : ""))
+      er = "GET not allowed";
+#if defined(PLUGIN) && !defined(NONFATAL)
+   if (!er)
+      er = PLUGIN(session);     // Fatal so done before redirect/ fail
+#endif
    if (er)
    {                            // Direct to login page
       sendredirect(NULL, er);
       return 1;                 // Failed
    }
+#if defined(PLUGIN) && defined(NONFATAL)
+   if (!er)
+      er = PLUGIN(session);     // Non fatal, so done after redirect / fail
 #endif
-#endif
+
    if (argc > 1)
    {                            /* Execute the arguments */
       int a;
