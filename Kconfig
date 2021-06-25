@@ -1,3 +1,5 @@
+menu "login system"
+
 menu "Database"
 
     config DB_CONF
@@ -68,12 +70,6 @@ menu "Database"
 	default "ID"
 	help
 		Field name of primary key in user table
-
-    config DB_USER_NAME_FIELD
-    	string "Field name in user table that is users name"
-	default "name"
-	help
-		Field name of user name in user table
 
     config DB_SESSION_TIME
     	string "Field name in session table for logged in time"
@@ -178,13 +174,13 @@ menu "CGI Wrapper"
 		Stops any POST without valid form security unless allowed on individual script
 
     config BLOCK_GET
-    	bool "Block all GET operations by default (per script usage can allow these)
+    	bool "Block all GET operations by default (per script usage can allow these)"
 	default n
 	help
 		Stops any GET unless set on individual script
 
     config BLOCK_POST
-    	bool "Block all POST operations by default (per script usage can allow these)
+    	bool "Block all POST operations by default (per script usage can allow these)"
 	default n
 	help
 		Stops any POST unless set on individual script
@@ -237,17 +233,43 @@ menu "Environment"
 	help
 		Users unique ID from user table for logged in user
 
-    config ENV_USER_NAME
-    	string "Environment variable for logged in user name"
-	default "USER_NAME"
-	help
-		Users name from user table
-
     config ENV_USERNAME
     	string "The environment variable for username when logging in"
 	default "USERNAME"
 	help
 		Field name to use in a form for username in login
+
+    config ENV_PREFIX
+    	string "Prefix for user table fields loaded in to environment"
+	default "USER_"
+	help
+		When loading fields from user table, prefix with this
+
+    config ENV_UPPER_CASE
+    	bool "Convert field names to upper case when loading from user table"
+	default y
+	help
+		When loading fields from user table, make them upper case
+
+    config ENV_USER_LOAD
+    	bool "Load all fields in user table to environment when logged in"
+	default n
+	help
+		If set, all fields (except password hash) are put in environment when logged in
+
+    config ENV_FIELD_LIST
+    	string "Only load specific fields from user table (comma separated list)"
+	default ""
+	depends on !ENV_USER_LOAD
+	help
+		If not empty then only specified fields are loaded
+
+    config ENV_FIELD_EXCLUDE
+    	string "Don't load specific fields from user table (comma separated list)"
+	default ""
+	depends on ENV_USER_LOAD
+	help
+		List the fields not to load in to environment when logged in (password has automatically excluded)
 
     config ENV_PASSWORD
     	string "The environment variable for password when logging in"
@@ -414,3 +436,4 @@ menu "Passwords"
 
 endmenu
 
+endmenu

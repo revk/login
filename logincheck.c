@@ -182,8 +182,43 @@ void loginenv(SQL_RES * res)
          uid = sql_col(res, CONFIG_DB_USERNAME_FIELD);
       setenv(CONFIG_ENV_USER_ID, uid, 1);
    }
-   if (*CONFIG_DB_USER_NAME_FIELD && *CONFIG_ENV_USER_NAME)
-      setenv(CONFIG_ENV_USER_NAME, sql_colz(res, CONFIG_DB_USER_NAME_FIELD), 1);
+   // load fields
+   void load(const char *list, int exclude) {
+      for (size_t n = 0; n < res->field_count; n++)
+      {                         // Check fields
+         const char *name = res->fields[n].name;
+         if (*CONFIG_DB_PASSWORD_FIELD && !strcasecmp(name, CONFIG_DB_PASSWORD_FIELD))
+            continue;           // Never password field
+         const char *value = res->current_row[n];
+         int len = strlen(name);
+         const char *l = list;
+         while (*l)
+         {
+            if (!strncasecmp(l, name, len) && !(l[len] || l[len] == ','))
+               break;
+            while (*l && *l != ',');
+            while (*l == ',' || *l == ' ')
+               l++;
+         }
+         if (!exclude && !*l)
+            continue;
+         if (exclude && *l)
+            continue;
+         char *var;
+         if (asprintf(&var, "%s%s", CONFIG_ENV_PREFIX, name) < 0)
+            errx(1, "malloc");
+#ifdef CONFIG_ENV_UPPER_CASE
+	 for(char *v=var;*v;v++)if(isalpha(*v))*v=toupper(*v);
+#endif
+	 if(!value)unsetenv(var);
+	 else setenv(var,value,1);
+	 free(var);
+      }
+   }
+#ifdef	CONFIG_ENV_USER_LOAD
+   load(CONFIG_ENV_FIELD_EXCLUDE, 0);
+#else
+   load(CONFIG_ENV_FIELD_LIST, 1);
+#endif
    // TODO
-
 }

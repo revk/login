@@ -75,7 +75,7 @@ selectdb.o: selectdb.c selectdb.h SQLlib/sqllib.o
 menuconfig:
 	./makek ${KCONFIG_CONFIG} config.h
 
-config.h: Kconfig ${KCONFIG_CONFIG}
+config.h: ${KCONFIG_CONFIG}
 	./makek ${KCONFIG_CONFIG} config.h
 
 ${KCONFIG_CONFIG}: Kconfig
