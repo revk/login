@@ -21,8 +21,8 @@ LINKFLAGS=${COMPFLAGS} ${SQLLIB} -lcrypto -lssl
 SQLlib/sqllib.o: SQLlib/sqllib.c
 	make -C SQLlib
 
-weblink: weblink.c base64.o password
-	gcc -o $@ $< ${LINKFLAGS} base64.o -lpopt -DSECRET=`./password`
+weblink: weblink.c base64.o password redirect.o
+	gcc -o $@ $< ${LINKFLAGS} base64.o -lpopt -DSECRET=`./password` redirect.o
 
 envcgi: envcgi.c envcgi.o errorwrap.o redirect.o base64.o password
 	gcc -o $@ $< ${LINKFLAGS} errorwrap.o redirect.o base64.o -DSECRET=`./password`

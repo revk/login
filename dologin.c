@@ -134,7 +134,7 @@ int main(int argc, const char *argv[])
       const struct poptOption optionsTable[] = {
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
          { "force", 0, POPT_ARG_NONE, &force, 0, "Force login for username/session", NULL },
-         { "redirect", 't', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
+         { "redirect", 'r', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
          { "session", 0, POPT_ARG_STRING, &session, 0, "Session", "session" },
          { "username", 0, POPT_ARG_STRING, &username, 0, "Username", "username" },
          { "password", 0, POPT_ARG_STRING, &password, 0, "Password", "password" },

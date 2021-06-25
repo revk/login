@@ -46,7 +46,7 @@ int main(int argc, const char *argv[])
       poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Silent", NULL },
-         { "redirect", 't', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
+         { "redirect", 'r', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
          { "session", 0, POPT_ARG_STRING, &session, 0, "Session", "session" },
          { "debug", 'v', POPT_ARG_NONE, &sqldebug, 0, "Debug", NULL },
          POPT_AUTOHELP { }

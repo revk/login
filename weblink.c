@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <openssl/sha.h>
 #include <err.h>
+#include "redirect.h"
 #include "base64.h"
 
 #define Q(x) #x                 // Trick to quote defined fields
@@ -21,6 +22,7 @@ int main(int argc, const char *argv[])
    const char *hash = "$QUERY_STRING";
    int checklink = 0;
    int silent = 0;
+   int redirect = 0;
    int hours = CONFIG_WEBLINK_AGE;
    {                            // POPT
       poptContext optCon;       // context for parsing command-line options
@@ -29,6 +31,7 @@ int main(int argc, const char *argv[])
          { "check", 0, POPT_ARG_NONE, &checklink, 0, "Check link", NULL },
          { "link", 0, POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT, &hash, 0, "Specify the link to check", "value" },
          { "hours", 0, POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &hours, 0, "Number of hours to allow", "N" },
+         { "redirect", 'r', POPT_ARG_NONE, &redirect, 0, "Redirect home/login", NULL },
          { "silent", 'q', POPT_ARG_NONE, &silent, 0, "Don't output value", NULL },
          POPT_AUTOHELP { }
       };
@@ -112,8 +115,13 @@ int main(int argc, const char *argv[])
          free(try);
          h++;
       }
-      if (h < hours && !silent)
-         printf("%s", value);
+      if (h < hours)
+      {
+         if (redirect)
+            sendredirect(NULL, "Link is incorrect or expired, sorry");
+         else if (!silent)
+            printf("%s", value);
+      }
       free(block);
       if (h < hours)
          return 0;
