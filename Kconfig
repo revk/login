@@ -239,13 +239,13 @@ menu "Environment"
 	help
 		Field name to use in a form for username in login
 
-    config ENV_PREFIX
+    config ENV_USER_PREFIX
     	string "Prefix for user table fields loaded in to environment"
 	default "USER_"
 	help
 		When loading fields from user table, prefix with this
 
-    config ENV_UPPER_CASE
+    config ENV_USER_UPPER_CASE
     	bool "Convert field names to upper case when loading from user table"
 	default y
 	help
@@ -257,19 +257,54 @@ menu "Environment"
 	help
 		If set, all fields (except password hash) are put in environment when logged in
 
-    config ENV_FIELD_LIST
+    config ENV_USER_FIELD_LIST
     	string "Only load specific fields from user table (comma separated list)"
 	default ""
 	depends on !ENV_USER_LOAD
 	help
 		If not empty then only specified fields are loaded
 
-    config ENV_FIELD_EXCLUDE
+    config ENV_USER_FIELD_EXCLUDE
     	string "Don't load specific fields from user table (comma separated list)"
 	default ""
 	depends on ENV_USER_LOAD
 	help
 		List the fields not to load in to environment when logged in (password has automatically excluded)
+
+    config ENV_SESSION_PREFIX
+    	string "Prefix for session table fields loaded in to environment"
+	default "SESSION_"
+	depends on DB_SEPARATE_SESSION
+	help
+		When loading fields from session table, prefix with this
+
+    config ENV_SESSION_UPPER_CASE
+    	bool "Convert field names to upper case when loading from session table"
+	default y
+	depends on DB_SEPARATE_SESSION
+	help
+		When loading fields from session table, make them upper case
+
+    config ENV_SESSION_LOAD
+    	bool "Load all fields in session table to environment when logged in"
+	default y
+	depends on DB_SEPARATE_SESSION
+	help
+		If set, all fields (some excluded) are put in environment when logged in
+
+    config ENV_SESSION_FIELD_LIST
+    	string "Only load specific fields from session table (comma separated list)"
+	default ""
+	depends on !ENV_SESSION_LOAD && DB_SEPARATE_SESSION
+	help
+		If not empty then only specified fields are loaded
+
+    config ENV_SESSION_FIELD_EXCLUDE
+    	string "Don't load specific fields from session table (comma separated list)"
+	default ""
+	depends on ENV_SESSION_LOAD && DB_SEPARATE_SESSION
+	help
+		List the fields not to load in to environment when logged in (some automatically excluded)
 
     config ENV_PASSWORD
     	string "The environment variable for password when logging in"

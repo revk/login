@@ -26,7 +26,7 @@ const char *changepassword(SQL * sqlp, const char *session, const char *oldpassw
    if (!newpassword || !*newpassword)
       return "No new password";
    selectdb(sqlp);
-   SQL_RES *res = find_session(sqlp, session);
+   SQL_RES *res = find_session(sqlp, session, 0);
    if (!res)
       return "Not logged in";
    if (!force)

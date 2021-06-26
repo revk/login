@@ -70,7 +70,7 @@ const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQ
    if (!sql_affected_rows(sqlp))
       return "Login failed";
 #ifdef  CONFIG_DB_SEPARATE_SESSION
-   find_session(sqlp, session); // Updates fields
+   find_session(sqlp, session, 0);      // Updates fields
 #endif
    return NULL;
 }

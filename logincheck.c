@@ -17,7 +17,11 @@
 #include "base64.h"
 #include "logincheck.h"
 
-SQL_RES *find_session(SQL * sqlp, const char *session)
+#ifdef CONFIG_DB_SEPARATE_SESSION
+void sessionenv(SQL_RES * res);
+#endif
+
+SQL_RES *find_session(SQL * sqlp, const char *session, int envstore)
 {
    SQL_RES *found = NULL;
 #ifdef CONFIG_DB_SEPARATE_SESSION
@@ -62,26 +66,33 @@ SQL_RES *find_session(SQL * sqlp, const char *session)
       if (*CONFIG_DB_SESSION_AGENT && (a = getenv("HTTP_USER_AGENT")) && (b = sql_colz(res, CONFIG_DB_SESSION_AGENT)) && strcmp(a, b))
          sql_sprintf(&s, "`%#S`=%#s,", CONFIG_DB_SESSION_AGENT, a);
 #endif
-      if (sql_back_s(&s) == ',')
+      if (uid && sql_back_s(&s) == ',')
       {
          sql_sprintf(&s, " WHERE `%#S`=%#s", CONFIG_DB_SESSION_FIELD, session);
          sql_safe_query_s(sqlp, &s);
       } else
          sql_free_s(&s);
+      if (envstore)
+         sessionenv(res);       // Store session data in environment (before update, but the fields we update are not included
       if (uid)
-      {
+      {                         // Valid, get user...
          sql_string_t s = { };
          sql_sprintf(&s, "SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USER_ID_FIELD, uid);
          sql_free_result(res);
          res = sql_safe_query_store_s(sqlp, &s);
          if (sql_fetch_row(res))
             found = res;
-      }
+      } else
+         sql_free_result(res);
    }
 #else
    SQL_RES *res = sql_safe_query_store_free(sqlp, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_SESSION_FIELD, session));
    if (sql_fetch_row(res))
+   {
       found = res;
+      if (envstore)
+         loginenv(res);
+   }
 #endif
    if (found)
       return found;
@@ -101,8 +112,7 @@ const char *logincheck(const char *session)
    SQL sql;
    sql_cnf_connect(&sql, CONFIG_DB_CONF);
    selectdb(&sql);
-   SQL_RES *res = find_session(&sql, session);
-   loginenv(res);
+   SQL_RES *res = find_session(&sql, session, 1);
    char nopass = 0;
    const char *fail = NULL;
    if (res)
@@ -208,9 +218,9 @@ void loginenv(SQL_RES * res)
          if (exclude && *l)
             continue;
          char *var;
-         if (asprintf(&var, "%s%s", CONFIG_ENV_PREFIX, name) < 0)
+         if (asprintf(&var, "%s%s", CONFIG_ENV_USER_PREFIX, name) < 0)
             errx(1, "malloc");
-#ifdef CONFIG_ENV_UPPER_CASE
+#ifdef CONFIG_ENV_USER_UPPER_CASE
          for (char *v = var; *v; v++)
             if (isalpha(*v))
                *v = toupper(*v);
@@ -223,8 +233,66 @@ void loginenv(SQL_RES * res)
       }
    }
 #ifdef	CONFIG_ENV_USER_LOAD
-   load(CONFIG_ENV_FIELD_EXCLUDE, 1);
+   load(CONFIG_ENV_USER_FIELD_EXCLUDE, 1);
 #else
-   load(CONFIG_ENV_FIELD_LIST, 0);
+   load(CONFIG_ENV_USER_FIELD_LIST, 0);
 #endif
 }
+
+#ifdef CONFIG_DB_SEPARATE_SESSION
+void sessionenv(SQL_RES * res)
+{                               // Fill in session environment variables
+   // load fields
+   void load(const char *list, int exclude) {
+      for (size_t n = 0; n < res->field_count; n++)
+      {                         // Check fields
+         const char *name = res->fields[n].name;
+         // Check excluded fields
+         if (*CONFIG_DB_SESSION_USER_LINK && !strcasecmp(name, CONFIG_DB_SESSION_USER_LINK))
+            continue;
+         if (*CONFIG_DB_SESSION_IP && !strcasecmp(name, CONFIG_DB_SESSION_IP))
+            continue;
+         if (*CONFIG_DB_SESSION_AGENT && !strcasecmp(name, CONFIG_DB_SESSION_AGENT))
+            continue;
+         if (*CONFIG_DB_SESSION_FIELD && !strcasecmp(name, CONFIG_DB_SESSION_FIELD))
+            continue;
+         if (*CONFIG_DB_SESSION_EXPIRES && !strcasecmp(name, CONFIG_DB_SESSION_EXPIRES))
+            continue;
+         const char *value = res->current_row[n];
+         int len = strlen(name);
+         const char *l = list;
+         while (*l)
+         {
+            if (!strncasecmp(l, name, len) && (!l[len] || l[len] == ','))
+               break;
+            while (*l && *l != ',')
+               l++;
+            while (*l == ',' || *l == ' ')
+               l++;
+         }
+         if (!exclude && !*l)
+            continue;
+         if (exclude && *l)
+            continue;
+         char *var;
+         if (asprintf(&var, "%s%s", CONFIG_ENV_SESSION_PREFIX, name) < 0)
+            errx(1, "malloc");
+#ifdef CONFIG_ENV_SESSION_UPPER_CASE
+         for (char *v = var; *v; v++)
+            if (isalpha(*v))
+               *v = toupper(*v);
+#endif
+         if (!value)
+            unsetenv(var);
+         else
+            setenv(var, value, 1);
+         free(var);
+      }
+   }
+#ifdef	CONFIG_ENV_SESSION_LOAD
+   load(CONFIG_ENV_SESSION_FIELD_EXCLUDE, 1);
+#else
+   load(CONFIG_ENV_SESSION_FIELD_LIST, 0);
+#endif
+}
+#endif
