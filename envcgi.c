@@ -836,7 +836,7 @@ int main(int argc, char *argv[])
 #endif
    if (er)
    {                            // Direct to login page or specific
-      sendredirect(*er == '/' ? er : NULL, er);
+      sendredirect(*er == '/' ? er : NULL, *er == '/' ? NULL : er);
       return 1;                 // Failed
    }
 #if defined(PLUGIN) && defined(NONFATAL)
