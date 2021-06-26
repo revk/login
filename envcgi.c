@@ -835,7 +835,7 @@ int main(int argc, char *argv[])
       er = PLUGIN(session);     // Fatal so done before redirect/ fail
 #endif
    if (er)
-   {                            // Direct to login page
+   {                            // Direct to login page or specific
       sendredirect(*er == '/' ? er : NULL, er);
       return 1;                 // Failed
    }
