@@ -175,7 +175,6 @@ const char *logincheck(const char *session)
       if (*CONFIG_PAGE_PASSWORD)
       {
          char *url = getenv("SCRIPT_NAME");
-	 warnx("check [%s] [%s]",url, CONFIG_PAGE_PASSWORD);
          if (strstr(url, CONFIG_PAGE_PASSWORD))
             return NULL; // This is the password page, so no error
          return CONFIG_PAGE_PASSWORD; // Go to password page (start with / to do redirect)

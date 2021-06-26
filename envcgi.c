@@ -836,7 +836,6 @@ int main(int argc, char *argv[])
 #endif
    if (er)
    {                            // Direct to login page or specific
-	   warnx("Error %s",er);
       sendredirect(*er == '/' ? er : NULL, er);
       return 1;                 // Failed
    }
