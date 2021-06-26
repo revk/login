@@ -88,14 +88,14 @@ SQL_RES *find_session(SQL * sqlp, const char *session, int envstore)
 #else
    SQL_RES *res = sql_safe_query_store_free(sqlp, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_SESSION_FIELD, session));
    if (sql_fetch_row(res))
-   {
       found = res;
-      if (envstore)
-         loginenv(res);
-   }
 #endif
    if (found)
+   {
+      if (envstore)
+         loginenv(found);
       return found;
+   }
    sql_free_result(res);
    return NULL;
 }
@@ -176,8 +176,8 @@ const char *logincheck(const char *session)
       {
          char *url = getenv("SCRIPT_NAME");
          if (strstr(url, CONFIG_PAGE_PASSWORD))
-            return NULL; // This is the password page, so no error
-         return CONFIG_PAGE_PASSWORD; // Go to password page (start with / to do redirect)
+            return NULL;        // This is the password page, so no error
+         return CONFIG_PAGE_PASSWORD;   // Go to password page (start with / to do redirect)
       }
       fail = "User has no password";
    }
