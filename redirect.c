@@ -26,12 +26,7 @@ void sendredirect(const char *page, const char *fail)
    if (back && !strcmp(back, CONFIG_PAGE_LOGIN))
       back = NULL;
    if (!page)
-   {
-      if (*CONFIG_PAGE_PASSWORD && fail && strstr(fail, "has no password"))
-         page = CONFIG_PAGE_PASSWORD;
-      else
          page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
-   }
    v = page;
    if (*v == '/')
       v++;

@@ -171,7 +171,7 @@ const char *logincheck(const char *session)
    }
    sql_close(&sql);
    if (!fail && nopass)
-      fail = "User has no password";
+      fail = "*User has no password";
    return fail;
 }
 
