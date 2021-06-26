@@ -217,7 +217,6 @@ menu "Environment"
     config ENV_DB
     	string "Database environment variable"
 	default "DB"
-	depends on DB_FROM_ENV
 	help
 		Name of database environment variable
 
