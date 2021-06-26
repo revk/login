@@ -11,7 +11,7 @@ void sendredirect(const char *page, const char *fail)
    if (havesentredirect)
       return;
    const char *v;
-   printf("Location: ");
+   printf("Status: 204\r\nRefresh: 0;URL=");
    if (*CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
       printf("%s", v);
 #ifdef  CONFIG_ENV_DB_FROM_URL
