@@ -331,7 +331,7 @@ menu "Environment"
 
     config ENV_FAIL
 	string "Fail link environment variable"
-	default "FAIL"
+	default "MSG"
 	help
 		Form variable included when redirecting to login page to show an error on the page
 
