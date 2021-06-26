@@ -832,31 +832,16 @@ int main(int argc, char *argv[])
       er = "GET form data not allowed";
 #if defined(PLUGIN) && !defined(NONFATAL)
    if (!er)
-   {
       er = PLUGIN(session);     // Fatal so done before redirect/ fail
-      if (*er == '*')
-      {                         // No password response - start *
-         if (*CONFIG_PAGE_PASSWORD)
-         {
-            sendredirect(CONFIG_PAGE_PASSWORD, er + 1);
-            return 1;
-         }
-         er = NULL;
-      }
-   }
 #endif
    if (er)
    {                            // Direct to login page
-      sendredirect(NULL, er);
+      sendredirect(*er == '/' ? er : NULL, er);
       return 1;                 // Failed
    }
 #if defined(PLUGIN) && defined(NONFATAL)
    if (!er)
-   {
       er = PLUGIN(session);     // Non fatal, so done after redirect / fail
-      if (*er == '*')
-         er++;
-   }
 #endif
 
    if (argc > 1)

@@ -171,7 +171,16 @@ const char *logincheck(const char *session)
    }
    sql_close(&sql);
    if (!fail && nopass)
-      fail = "*User has no password";
+   {
+      if (*CONFIG_PAGE_PASSWORD)
+      {
+         char *url = getenv("SCRIPT_URI");
+         if (strstr(url, CONFIG_PAGE_PASSWORD))
+            return NULL;
+         return CONFIG_PAGE_PASSWORD;
+      }
+      fail = "User has no password";
+   }
    return fail;
 }
 

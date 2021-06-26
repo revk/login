@@ -26,9 +26,9 @@ void sendredirect(const char *page, const char *fail)
    if (back && !strcmp(back, CONFIG_PAGE_LOGIN))
       back = NULL;
    if (!page)
-         page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
+      page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
 #ifdef DB_DEBUG
-   warnx("Redirect to %s",page);
+   warnx("Redirect to %s", page);
 #endif
    v = page;
    if (*v == '/')
