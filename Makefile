@@ -11,6 +11,11 @@ SQLLIB=$(shell mariadb_config --libs)
 SQLVER=$(shell mariadb_config --version | sed 'sx\..*xx')
 endif
 
+update:
+	git submodule update --init --remote --recursive
+	git commit -a -m "Library update"
+	git push
+
 ifndef KCONFIG_CONFIG
 KCONFIG_CONFIG=../login.conf
 endif
