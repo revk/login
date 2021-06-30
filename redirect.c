@@ -27,7 +27,8 @@ void sendredirect(const char *page, const char *fail)
    printf("Content-Type: text/plain\r\nRefresh: 0;URL=");
    if (strncasecmp(page, "http://", 7) && strncasecmp(page, "https://", 8) && *CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
       printf("%s", v);
-   else printf("/");
+   else
+      printf("/");
 #ifdef  CONFIG_ENV_DB_FROM_URL
    if (*CONFIG_ENV_DB && (v = getenv(CONFIG_ENV_DB)) && *v)
       printf("%s/", v);
@@ -64,8 +65,11 @@ void sendredirect(const char *page, const char *fail)
 int main(int argc, const char *argv[])
 {
    char *url = getenv(CONFIG_ENVCGI_SCRIPT) ? : "/";
+   char *fail = NULL;
    if (argc > 1)
       url = (char *) argv[1];
+   if (argc > 2)
+      fail = argv[2];
    if (strncasecmp(url, "http://", 7) && strncasecmp(url, "https://", 8) && asprintf(&url, "%s%s", getenv(CONFIG_ENVCGI_SERVER) ? : "/", *url == '/' ? url + 1 : url) < 0)
       errx(1, "malloc");
    sendredirect(url, NULL);
