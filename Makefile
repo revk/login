@@ -1,4 +1,4 @@
-all:	password envcgi loggedin logincheck dologin dologout changepassword weblink
+all:	password envcgi loggedin logincheck dologin dologout changepassword weblink redirect
 
 ifneq ($(wildcard /usr/bin/mysql_config),)
 SQLINC=$(shell mysql_config --include)
@@ -70,6 +70,9 @@ changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 
 hashes.o: hashes.c hashes.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
+
+redirect: redirect.c redirect.o
+	gcc -o $@ $< ${LINKFLAGS}
 
 redirect.o: redirect.c redirect.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}

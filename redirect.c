@@ -12,13 +12,6 @@ void sendredirect(const char *page, const char *fail)
    if (havesentredirect)
       return;
    const char *v;
-   printf("Content-Type: text/plain\r\nRefresh: 0;URL=");
-   if (*CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
-      printf("%s", v);
-#ifdef  CONFIG_ENV_DB_FROM_URL
-   if (*CONFIG_ENV_DB && (v = getenv(CONFIG_ENV_DB)) && *v)
-      printf("%s/", v);
-#endif
    const char *back = NULL;
    if (*CONFIG_ENV_BACK)
       back = getenv(CONFIG_ENV_BACK);
@@ -30,6 +23,14 @@ void sendredirect(const char *page, const char *fail)
       page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
 #ifdef CONFIG_DB_DEBUG
    warnx("Redirect to %s er %s", page, fail);
+#endif
+   printf("Content-Type: text/plain\r\nRefresh: 0;URL=");
+   if (strncasecmp(page, "http://", 7) && strncasecmp(page, "https://", 8) && *CONFIG_ENVCGI_SERVER && (v = getenv(CONFIG_ENVCGI_SERVER)))
+      printf("%s", v);
+   else printf("/");
+#ifdef  CONFIG_ENV_DB_FROM_URL
+   if (*CONFIG_ENV_DB && (v = getenv(CONFIG_ENV_DB)) && *v)
+      printf("%s/", v);
 #endif
    v = page;
    if (*v == '/')
@@ -58,3 +59,16 @@ void sendredirect(const char *page, const char *fail)
    havesentredirect = 1;
    fflush(stdout);
 }
+
+#ifndef LIB
+int main(int argc, const char *argv[])
+{
+   char *url = getenv(CONFIG_ENVCGI_SCRIPT) ? : "/";
+   if (argc > 1)
+      url = (char *) argv[1];
+   if (strncasecmp(url, "http://", 7) && strncasecmp(url, "https://", 8) && asprintf(&url, "%s%s", getenv(CONFIG_ENVCGI_SERVER) ? : "/", *url == '/' ? url + 1 : url) < 0)
+      errx(1, "malloc");
+   sendredirect(url, NULL);
+   return 0;
+}
+#endif
