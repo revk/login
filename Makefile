@@ -42,16 +42,16 @@ password.o: password.c password.h config.h xkcd936-wordlist.h
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 loggedin: envcgi.c logincheck.o hashes.o redirect.o selectdb.o base64.o
-	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o base64.o ${LINKFLAGS}
+	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -lm -lpopt SQLlib/sqllib.o hashes.o selectdb.o base64.o -largon2 ${LINKFLAGS}
 
 logincheck: envcgi.c logincheck.o hashes.o redirect.o selectdb.o base64.o
-	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -DNONFATAL -lm -lpopt SQLlib/sqllib.o hashes.o -largon2 selectdb.o base64.o ${LINKFLAGS}
+	gcc -o $@ $< logincheck.o errorwrap.o redirect.o -DPLUGIN=logincheck -DNONFATAL -lm -lpopt SQLlib/sqllib.o hashes.o selectdb.o base64.o -largon2 ${LINKFLAGS}
 
 logincheck.o: logincheck.c config.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 dologin: dologin.c dologin.o hashes.o redirect.o selectdb.o logincheck.o base64.o
-	gcc -o $@ $< -lm -lpopt SQLlib/sqllib.o redirect.o -largon2 hashes.o selectdb.o logincheck.o base64.o ${LINKFLAGS}
+	gcc -o $@ $< -lm -lpopt SQLlib/sqllib.o redirect.o hashes.o selectdb.o logincheck.o base64.o -largon2 ${LINKFLAGS}
 
 dologin.o: dologin.c dologin.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
@@ -63,7 +63,7 @@ dologout.o: dologout.c dologout.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
 
 changepassword: changepassword.c changepassword.o logincheck.o hashes.o selectdb.o base64.o redirect.o
-	gcc -o $@ $< -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o -largon2 selectdb.o base64.o redirect.o ${LINKFLAGS}
+	gcc -o $@ $< -lm -lpopt SQLlib/sqllib.o logincheck.o hashes.o selectdb.o base64.o redirect.o -largon2 ${LINKFLAGS}
 
 changepassword.o: changepassword.c changepassword.h SQLlib/sqllib.o
 	gcc -c -o $@ $< -DLIB ${COMPFLAGS}
