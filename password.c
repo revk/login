@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <err.h>
 #include "password.h"
 #include "xkcd936-wordlist.h"
