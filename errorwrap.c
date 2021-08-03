@@ -59,7 +59,7 @@ void errorwrap_opts(errorwrap_t o)
                gettimeofday(&tv, &tz);
                localtime_r(&tv.tv_sec, &tm);
                strftime(d, sizeof(d), "%F %T", &tm);
-               fprintf(out, "%s.%06ld:", d, tv.tv_usec);
+               fprintf(out, "%s.%06ld: ", d, tv.tv_usec);
             }
             fwrite(temp, l, 1, out);
             eol = (temp[l - 1] < ' ');
