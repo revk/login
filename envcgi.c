@@ -282,6 +282,7 @@ int main(int argc, char *argv[])
    int noinsecurepost = 0;
 #endif
    int passpost = 0;
+   int timestamp=0;
    while (argc > 1)
    {
 #ifdef EXTRAARG1
@@ -316,6 +317,8 @@ int main(int argc, char *argv[])
       }
       if (check("all-file"))
          allfile++;
+      else if (check("timestamp"))
+         timestamp = 1;
       else if (check("pass-post"))
          passpost = 1;
       else if (check("no-cookie"))
@@ -690,7 +693,7 @@ int main(int argc, char *argv[])
          while (files)
             unlink(fname[--files]);
       }
-    errorwrap(done:done);
+    errorwrap(done:done,timestamp:timestamp);
    }
 
    q = getenv("HTTP_COOKIE");

@@ -29,6 +29,10 @@ void errorwrap_opts(errorwrap_t o)
       err(1, "fork");
    if (pid)
    {                            /* parent, wait for child */
+      struct timeval tv;
+      struct timezone tz;
+      struct tm tm;
+      char d[21];
       char *buf = NULL;
       size_t l;
       FILE *out = open_memstream(&buf, &l);
@@ -38,21 +42,29 @@ void errorwrap_opts(errorwrap_t o)
          const char *scriptend = strrchr(o.name, '.');
          if (!scriptend || strcmp(scriptend, ".cgi"))
             scriptend = o.name + strlen(o.name);
-         struct timeval tv;
-         struct timezone tz;
          gettimeofday(&tv, &tz);
-         struct tm t;
-         localtime_r(&tv.tv_sec, &t);
-         char d[21];
-         strftime(d, sizeof(d), "%F %T", &t);
+         localtime_r(&tv.tv_sec, &tm);
+         strftime(d, sizeof(d), "%F %T", &tm);
          fprintf(out, "%s.%06ld: %.*s\t%s\n", d, tv.tv_usec, (int) (scriptend - o.name), o.name, o.ip);
       }
       close(pipefd[1]);
       size_t t = 0;
+      char eol = 0;
       {                         // Get stderr
          char temp[16 * 1024];
-         while ((l = read(pipefd[0], temp, sizeof(temp))) > 0 && fwrite(temp, l, 1, out) == 1)
-            t += l;
+         while ((l = read(pipefd[0], temp, sizeof(temp))) > 0)
+         {
+            if (eol && o.timestamp)
+            {
+               gettimeofday(&tv, &tz);
+               localtime_r(&tv.tv_sec, &tm);
+               strftime(d, sizeof(d), "%F %T", &tm);
+               fprintf(out, "%s.%06ld:", d, tv.tv_usec);
+            }
+            fwrite(temp, l, 1, out);
+            eol = (temp[l - 1] < ' ');
+         }
+         t += l;
       }
       close(pipefd[0]);
       int wstatus = 0;
