@@ -31,6 +31,10 @@ Normally these wrappers are followed by the shell you are using, but you can add
 - `--no-insecure-post`	Do not allow a POST which fails form security checks (default depends on config)
 - `--insecure-post`	Allow a POST which fails form security checks (default depends on config)
 - `--all-file`		Treat all fields as if they were a file post
+- `--error-wrap`	Wrap error output in timestamped log
+- `--no-error-wrap`	No error wrap
+- `--time-stamp`	Line timestamp the error log
+- `--no-time-stamp`	No line timestamp the error log
 
 ## Logged in wrapper
 

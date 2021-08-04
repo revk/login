@@ -8,8 +8,6 @@
 // and storing in the environment... Then execs the arguments with that
 // environment.
 //
-// Use -dNOFORK to avoid fork and debug error
-//
 //#define DEBUG
 
 #include "config.h"
@@ -282,7 +280,16 @@ int main(int argc, char *argv[])
    int noinsecurepost = 0;
 #endif
    int passpost = 0;
-   int timestamp=0;
+#ifdef	CONFIG_ERROR_WRAP
+   int doerrorwrap = 1;
+#else
+   int doerrorwrap = 0;
+#endif
+#ifdef	CONFIG_LINE_TIMESTAMP
+   int timestamp = 1;
+#else
+   int timestamp = 0;
+#endif
    while (argc > 1)
    {
 #ifdef EXTRAARG1
@@ -317,8 +324,14 @@ int main(int argc, char *argv[])
       }
       if (check("all-file"))
          allfile++;
-      else if (check("timestamp"))
+      else if (check("time-stamp"))
          timestamp = 1;
+      else if (check("no-time-stamp"))
+         timestamp = 0;
+      else if (check("error-wrap"))
+         doerrorwrap = 1;
+      else if (check("no-error-wrap"))
+         doerrorwrap = 0;
       else if (check("pass-post"))
          passpost = 1;
       else if (check("no-cookie"))
@@ -685,15 +698,13 @@ int main(int argc, char *argv[])
             qnext();
       }
    }
-#ifdef	NOFORK
-   if (files)
-#endif
    {                            // Fork, for cleanup or logging
       void done(void) {
          while (files)
             unlink(fname[--files]);
       }
-    errorwrap(done:done,timestamp:timestamp);
+      if (doerrorwrap||files)
+       errorwrap(done: done, timestamp:timestamp);
    }
 
    q = getenv("HTTP_COOKIE");

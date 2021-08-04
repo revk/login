@@ -210,6 +210,21 @@ menu "CGI Wrapper"
 	help
 		Allow http authorisation page by page login, e.g. for use with curl
 
+    config ERROR_WRAP
+    	bool "Log http error output in timestamped error log"
+	default y
+	help
+		Error output from login tool cgi scripts is collected as one timestamped error log output
+		This happens anyway if local files made
+
+    config LINE_TIMESTAMP
+    	bool "Per line timestamp on error wrap"
+	default y
+	depends on ERROR_WRAP
+	help
+		Each line, or lines written together, get a timestamp within the wrapped error log output
+
+
 endmenu
 
 menu "Environment"
