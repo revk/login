@@ -63,8 +63,8 @@ void errorwrap_opts(errorwrap_t o)
             }
             fwrite(temp, l, 1, out);
             eol = (temp[l - 1] < ' ');
+            t += l;
          }
-         t += l;
       }
       close(pipefd[0]);
       int wstatus = 0;
