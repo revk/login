@@ -159,8 +159,10 @@ const char *logincheck(const char *session)
                      free(newhash);
                   }
                   if (newhash)
+                  {
                      fail = NULL;       // Yay...
-                  else
+                     loginenv(res);
+                  } else
                      fail = "Login failed";
                }
                sql_free_result(res);
