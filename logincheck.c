@@ -139,7 +139,6 @@ const char *logincheck(const char *session)
             if (pass)
             {
                *pass++ = 0;
-               warnx("user %s pass %s", auth, pass);
                // Find the user
                SQL_RES *res = sql_safe_query_store_free(&sql, sql_printf("SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USERNAME_FIELD, auth));
                if (!sql_fetch_row(res))
