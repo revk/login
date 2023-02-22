@@ -29,7 +29,7 @@ const char *forcelogin(SQL * sqlp, const char *session, const char *username, SQ
    if (!session || !*session)
       return "No session";
    selectdb(sqlp);
-   sql_string_t s = { };
+   sql_s_t s = {0};
 #ifdef	CONFIG_DB_SEPARATE_SESSION
    sql_sprintf(&s, "REPLACE INTO `%#S` SET ", CONFIG_DB_SESSION_TABLE);
    const char *uid = username;

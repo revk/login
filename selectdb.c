@@ -1,6 +1,7 @@
 // Select the database
 
 #include "config.h"
+#include <stdio.h>
 #include <sqllib.h>
 
 void selectdb(SQL * sqlp)

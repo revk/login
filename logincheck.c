@@ -30,7 +30,7 @@ SQL_RES *find_session(SQL * sqlp, const char *session, int envstore)
    {
       const char *uid = sql_col(res, CONFIG_DB_SESSION_USER_LINK);
       // Update session
-      sql_string_t s = { };
+      sql_s_t s = {0};
       sql_sprintf(&s, "UPDATE `%#S` SET ", CONFIG_DB_SESSION_TABLE);
 #ifdef CONFIG_DB_SESSION_EXPIRES
       if (*CONFIG_DB_SESSION_EXPIRES)
@@ -76,7 +76,7 @@ SQL_RES *find_session(SQL * sqlp, const char *session, int envstore)
          sessionenv(res);       // Store session data in environment (before update, but the fields we update are not included
       if (uid)
       {                         // Valid, get user...
-         sql_string_t s = { };
+         sql_s_t s = {0};
          sql_sprintf(&s, "SELECT * FROM `%#S` WHERE `%#S`=%#s", CONFIG_DB_USER_TABLE, CONFIG_DB_USER_ID_FIELD, uid);
          sql_free_result(res);
          res = sql_safe_query_store_s(sqlp, &s);
