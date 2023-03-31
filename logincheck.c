@@ -108,8 +108,13 @@ const char *logincheck(const char *session)
    // Clearing user ID
    if (*CONFIG_ENV_USER_ID)
       unsetenv(CONFIG_ENV_USER_ID);
-   if (*CONFIG_DB_CONF && *ENV_SQL_CNF_FILE)
-      setenv(ENV_SQL_CNF_FILE, CONFIG_DB_CONF); // Typically to allow sql commands to use the config file
+   if (*CONFIG_ENV_SQL_CNF_FILE)
+   {
+      if (*CONFIG_DB_CONF)
+         setenv(CONFIG_ENV_SQL_CNF_FILE, CONFIG_DB_CONF, 1);   // Typically to allow sql commands to use the config file
+      else
+         unsetenv(CONFIG_ENV_SQL_CNF_FILE);
+   }
    // Check login
    SQL sql;
    sql_cnf_connect(&sql, CONFIG_DB_CONF);
