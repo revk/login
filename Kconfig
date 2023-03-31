@@ -235,6 +235,12 @@ menu "Environment"
 	help
 		Name of database environment variable
 
+    config ENV_SQL_CNF_FILE
+    	string "SQL cnf file  environment variable"
+	default "SQL_CNF_FILE"
+	help
+		Name of database environment variable
+
     config ENV_SESSION
 	string "Session environment variable"
 	default "ENVCGI"
