@@ -23,14 +23,15 @@
 // Password is between min and max in length and at least
 // specified number of bits of entropy. NULL if cannot
 // generate a password (can be avoided by entropy <= max*5)
-const char *password(int min, int max, int entropy)
+const char *
+password (int min, int max, int entropy)
 {
-   int r = open(RANDOM, O_RDONLY, 0);
+   int r = open (RANDOM, O_RDONLY, 0);
    if (r < 0)
-      err(1, "Cannot open " RANDOM);
-   char *password = malloc(max + 1);    // space for new password
+      err (1, "Cannot open " RANDOM);
+   char *password = malloc (max + 1);   // space for new password
    if (!password)
-      errx(1, "malloc");
+      errx (1, "malloc");
 
    float e;                     // entropy count
    int p;                       // position in new password
@@ -43,17 +44,17 @@ const char *password(int min, int max, int entropy)
       while ((p < min || e < entropy) && p < max)
       {                         // lets add words as per XKCD936 (adjective/noun pairs)
          unsigned long long v = 0;
-         if (read(r, &v, sizeof(v)) != sizeof(v))
-            err(1, "Bad read " RANDOM);
-         unsigned long long words = (w ? sizeof(w2) / sizeof(*w2) : sizeof(w1) / sizeof(*w1));
+         if (read (r, &v, sizeof (v)) != sizeof (v))
+            err (1, "Bad read " RANDOM);
+         unsigned long long words = (w ? sizeof (w2) / sizeof (*w2) : sizeof (w1) / sizeof (*w1));
          v %= words;
          const char *word = (w ? w2 : w1)[v];
-         int l = strlen(word);
+         int l = strlen (word);
          if (p + l < max)
          {                      // add the word
-            e += log2f(words);  // count the entropy
+            e += log2f (words); // count the entropy
             w = 1 - w;
-            memmove(password + p, word, l);
+            memmove (password + p, word, l);
             p += l;
          } else
             break;
@@ -64,17 +65,17 @@ const char *password(int min, int max, int entropy)
          while ((p < min || e < entropy) && p < max)
          {                      // lets add words as per XKCD936
             unsigned long long v = 0;
-            if (read(r, &v, sizeof(v)) != sizeof(v))
-               err(1, "Bad read " RANDOM);
-            unsigned long long words = sizeof(w0) / sizeof(*w0);
+            if (read (r, &v, sizeof (v)) != sizeof (v))
+               err (1, "Bad read " RANDOM);
+            unsigned long long words = sizeof (w0) / sizeof (*w0);
             v %= words;
             const char *word = w0[v];
-            int l = strlen(word);
+            int l = strlen (word);
             if (p + l < max)
             {                   // add the word
-               e += log2f(words);       // count the entropy
+               e += log2f (words);      // count the entropy
                w = 1 - w;
-               memmove(password + p, word, l);
+               memmove (password + p, word, l);
                p += l;
             } else
                break;
@@ -84,97 +85,98 @@ const char *password(int min, int max, int entropy)
       while (p < max && e < entropy)
       {                         // try adding digits to make up entropy
          unsigned long long v = 0;
-         if (read(r, &v, sizeof(v)) != sizeof(v))
-            err(1, "Bad read " RANDOM);
+         if (read (r, &v, sizeof (v)) != sizeof (v))
+            err (1, "Bad read " RANDOM);
          v %= 10;
          password[p++] = '0' + v;
-         e += log2f(10);
+         e += log2f (10);
       }
       if (p >= min && e >= entropy)
          break;                 // managed it using words
    }
-   if (e < entropy && entropy <= max * log2f(32))
+   if (e < entropy && entropy <= max * log2f (32))
    {                            // try again completely different style
       p = e = 0;
       while ((p < min || e < entropy) && p < max)
       {
          unsigned long long v = 0;
-         if (read(r, &v, sizeof(v)) != sizeof(v))
-            err(1, "Bad read " RANDOM);
+         if (read (r, &v, sizeof (v)) != sizeof (v))
+            err (1, "Bad read " RANDOM);
          v %= 32;
          password[p++] = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[v]; // Not quite BASE32, this avoids I/O/1/0 clashes, as passwords may need reading and typing
-         e += log2f(32);
+         e += log2f (32);
       }
    }
-   if (e < entropy && entropy <= max * log2f(64))
+   if (e < entropy && entropy <= max * log2f (64))
    {                            // try again completely different style
       p = e = 0;
       while ((p < min || e < entropy) && p < max)
       {
          unsigned long long v = 0;
-         if (read(r, &v, sizeof(v)) != sizeof(v))
-            err(1, "Bad read " RANDOM);
+         if (read (r, &v, sizeof (v)) != sizeof (v))
+            err (1, "Bad read " RANDOM);
          v %= 64;
          password[p++] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[v]; // Base 64
-         e += log2f(64);
+         e += log2f (64);
       }
    }
-   if (e < entropy && entropy <= max * log2f(94))
+   if (e < entropy && entropy <= max * log2f (94))
    {                            // try again completely different style
       p = e = 0;
       while ((p < min || e < entropy) && p < max)
       {
          unsigned long long v = 0;
-         if (read(r, &v, sizeof(v)) != sizeof(v))
-            err(1, "Bad read " RANDOM);
+         if (read (r, &v, sizeof (v)) != sizeof (v))
+            err (1, "Bad read " RANDOM);
          v %= 94;
          password[p++] = '!' + v;
-         e += log2f(94);
+         e += log2f (94);
       }
    }
    password[p] = 0;
-   close(r);
+   close (r);
    if (e < entropy)
    {                            // Failed
-      free(password);
+      free (password);
       return NULL;
    }
    return password;
 }
 
 #ifndef	LIB                     // Command line
-int main(int argc, const char *argv[])
+int
+main (int argc, const char *argv[])
 {
    int min = CONFIG_PASSWORD_MIN;
    int max = CONFIG_PASSWORD_MAX;
    int entropy = CONFIG_PASSWORD_ENTROPY;
+   poptContext optCon;          // context for parsing command-line options
    {                            // POPT
-      poptContext optCon;       // context for parsing command-line options
       const struct poptOption optionsTable[] = {
-         { "min", 'm', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &min, 0, "Min password len", "characters" },
-         { "max", 'x', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &max, 0, "Max password len", "characters" },
-         { "entropy", 'e', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &entropy, 0, "Min entropy", "bits" },
-         POPT_AUTOHELP { }
+         {"min", 'm', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &min, 0, "Min password len", "characters"},
+         {"max", 'x', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &max, 0, "Max password len", "characters"},
+         {"entropy", 'e', POPT_ARG_INT | POPT_ARGFLAG_SHOW_DEFAULT, &entropy, 0, "Min entropy", "bits"},
+         POPT_AUTOHELP {}
       };
 
-      optCon = poptGetContext(NULL, argc, argv, optionsTable, 0);
+      optCon = poptGetContext (NULL, argc, argv, optionsTable, 0);
 
       int c;
-      if ((c = poptGetNextOpt(optCon)) < -1)
-         errx(1, "%s: %s\n", poptBadOption(optCon, POPT_BADOPTION_NOALIAS), poptStrerror(c));
+      if ((c = poptGetNextOpt (optCon)) < -1)
+         errx (1, "%s: %s\n", poptBadOption (optCon, POPT_BADOPTION_NOALIAS), poptStrerror (c));
 
-      if (poptPeekArg(optCon))
+      if (poptPeekArg (optCon))
       {
-         poptPrintUsage(optCon, stderr, 0);
+         poptPrintUsage (optCon, stderr, 0);
          return -1;
       }
-      poptFreeContext(optCon);
    }
 
-   const char *pass = password(min, max, entropy);
-   printf("%s", pass);
-   free((char *) pass);
+   const char *pass = password (min, max, entropy);
+   printf ("%s", pass);
+   free ((char *) pass);
 
+   poptFreeContext (optCon);
    return 0;
 }
 #endif
