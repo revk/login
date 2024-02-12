@@ -87,8 +87,7 @@ find_session (SQL * sqlp, const char *session, int envstore)
          res = sql_safe_query_store_s (sqlp, &s);
          if (sql_fetch_row (res))
             found = res;
-      } else
-         sql_free_result (res);
+      }
    }
 #else
    SQL_RES *res =
