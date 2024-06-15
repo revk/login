@@ -842,8 +842,10 @@ main (int argc, char *argv[])
             setenv (CONFIG_ENV_DB, u, 1);
 #endif
 #else
+#ifdef	CONFIG_ENV_DB
          if (*CONFIG_ENV_DB && *CONFIG_DB_DATABASE)
             setenv (CONFIG_ENV_DB, CONFIG_DB_DATABASE, 1);
+#endif
 #endif
          if (!post)
          {
