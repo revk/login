@@ -70,7 +70,7 @@ sendredirect (const char *page, const char *fail)
 #endif
 #ifdef	CONFIG_ENV_FAIL
    add (CONFIG_ENV_FAIL, fail);
-#endi
+#endif
    printf ("\r\n\r\n");
    havesentredirect = 1;
    fflush (stdout);
