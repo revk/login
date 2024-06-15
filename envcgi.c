@@ -770,7 +770,7 @@ main (int argc, char *argv[])
       }
    }
 
-#ifndef	CONFIG_SESSION_COOKIE
+#ifdef	CONFIG_SESSION_COOKIE
    if (*CONFIG_SESSION_COOKIE && !nocookie)
    {
       if (!session || !*session)
