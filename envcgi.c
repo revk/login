@@ -31,6 +31,10 @@
 #include "base64.h"
 #include "envcgi.h"
 
+#ifndef	CONFIG_ENV_RELAY_ADDR
+#define	CONFIG_ENV_RELAY_ADDR	"RELAY_ADDR"
+#endif
+
 #define MAX 110240
 #define MAXF 50
 
@@ -750,9 +754,11 @@ main (int argc, char *argv[])
          } else
             ev[e] = '=';        // not value
          ev[e] = 0;
+#ifdef	CONFIG_SESSION_COOKIE
          if (*CONFIG_SESSION_COOKIE && s == 7 + sizeof (CONFIG_SESSION_COOKIE) - 1
              && !memcmp (ev + 7, CONFIG_SESSION_COOKIE, sizeof (CONFIG_SESSION_COOKIE) - 1))
             session = strdup (ev + s + 1);
+#endif
          store (ev);
          if (*q == ';')
             q++;
@@ -764,6 +770,7 @@ main (int argc, char *argv[])
       }
    }
 
+#ifndef	CONFIG_SESSION_COOKIE
    if (*CONFIG_SESSION_COOKIE && !nocookie)
    {
       if (!session || !*session)
@@ -784,6 +791,7 @@ main (int argc, char *argv[])
 
    if (session && *CONFIG_ENV_SESSION)
       setenv (CONFIG_ENV_SESSION, session, 1);
+#endif
 
    char *https = getenv ("HTTPS");
    {                            // Helpful environment variables
