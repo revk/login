@@ -47,6 +47,7 @@ sendredirect (const char *page, const char *fail)
    if (*v == '/')
       v++;
    printf ("%s", v);
+#if defined(CONFIG_ENV_BACK) || defined(CONFIG_ENV_FAIL)
    void add (const char *tag, const char *val)
    {
       if (!tag || !*tag || !val || !*val)
@@ -70,6 +71,7 @@ sendredirect (const char *page, const char *fail)
 #endif
 #ifdef	CONFIG_ENV_FAIL
    add (CONFIG_ENV_FAIL, fail);
+#endif
 #endif
    printf ("\r\n\r\n");
    havesentredirect = 1;

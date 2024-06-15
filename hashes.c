@@ -1,4 +1,5 @@
 // Hash handling
+#define OPENSSL_API_COMPAT      0x10100000L
 
 #include "config.h"
 #include <stdio.h>
