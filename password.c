@@ -144,6 +144,12 @@ password (int min, int max, int entropy)
 }
 
 #ifndef	LIB                     // Command line
+#ifndef	CONFIG_PASSWORD_MIN
+#define	CONFIG_PASSWORD_MIN	8
+#endif
+#ifndef	CONFIG_PASSWORD_MAX
+#define	CONFIG_PASSWORD_MAX	32
+#endif
 int
 main (int argc, const char *argv[])
 {
