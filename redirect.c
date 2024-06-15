@@ -14,14 +14,18 @@ sendredirect (const char *page, const char *fail)
       return;
    const char *v;
    const char *back = NULL;
+#ifdef	CONFIG_ENV_BACK
    if (*CONFIG_ENV_BACK)
       back = getenv (CONFIG_ENV_BACK);
+#endif
    if (!back && fail)
       back = getenv ("REQUEST_URI");
+#ifdef	CONFIG_PAGE_LOGIN
    if (back && !strcmp (back, CONFIG_PAGE_LOGIN))
       back = NULL;
    if (!page)
       page = (fail ? CONFIG_PAGE_LOGIN : back ? : CONFIG_PAGE_HOME);
+#endif
 #ifdef CONFIG_DB_DEBUG
    warnx ("Redirect to %s er %s", page, fail);
 #endif
@@ -64,7 +68,7 @@ sendredirect (const char *page, const char *fail)
 #endif
 #ifdef	CONFIG_ENV_FAIL
    add (CONFIG_ENV_FAIL, fail);
-#endif
+#endi
    printf ("\r\n\r\n");
    havesentredirect = 1;
    fflush (stdout);
