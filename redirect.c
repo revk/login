@@ -25,7 +25,7 @@ sendredirect (const char *page, const char *fail)
 #ifdef CONFIG_DB_DEBUG
    warnx ("Redirect to %s er %s", page, fail);
 #endif
-   printf ("Content-Type: text/plain\r\nRefresh: 0;URL=");
+   printf("Status: 303\r\nLocation: ");
    if (strncasecmp (page, "http://", 7) && strncasecmp (page, "https://", 8))
    {
       if (*CONFIG_ENVCGI_SERVER && (v = getenv (CONFIG_ENVCGI_SERVER)))
@@ -59,9 +59,13 @@ sendredirect (const char *page, const char *fail)
          val++;
       }
    }
+#ifdef	CONFIG_ENV_BACK
    add (CONFIG_ENV_BACK, back);
+#endif
+#ifdef	CONFIG_ENV_FAIL
    add (CONFIG_ENV_FAIL, fail);
-   printf ("\n\r\n\r");
+#endif
+   printf ("\r\n\r\n");
    havesentredirect = 1;
    fflush (stdout);
 }
