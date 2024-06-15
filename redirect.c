@@ -32,9 +32,11 @@ sendredirect (const char *page, const char *fail)
    printf("Status: 303\r\nLocation: ");
    if (strncasecmp (page, "http://", 7) && strncasecmp (page, "https://", 8))
    {
+#ifdef	CONFIG_ENVCGI_SERVER
       if (*CONFIG_ENVCGI_SERVER && (v = getenv (CONFIG_ENVCGI_SERVER)))
          printf ("%s", v);
       else
+#endif
          printf ("/");
    }
 #ifdef  CONFIG_ENV_DB_FROM_URL
