@@ -806,8 +806,10 @@ main (int argc, char *argv[])
          else
             p += sprintf (p, "http://");
          p += sprintf (p, "%s/", host);
+#ifdef	CONFIG_ENVCGI_SERVER
          if (*CONFIG_ENVCGI_SERVER)
             setenv (CONFIG_ENVCGI_SERVER, temp, 1);
+#endif
          sprintf (p - 1, "%s", uri);
          char *q = p;
 #ifdef	CONFIG_ENV_DB_FROM_URL
@@ -817,13 +819,17 @@ main (int argc, char *argv[])
             q++;
          if (*q == '?')
             *q-- = 0;
+#ifdef	CONFIG_ENVCGI_SCRIPT
          if (*CONFIG_ENVCGI_SCRIPT)
             setenv (CONFIG_ENVCGI_SCRIPT, temp, 1);
+#endif
          while (q > p && q[-1] != '/')
             q--;
          *q = 0;
+#ifdef	CONFIG_ENVCGI_DIRECTORY
          if (*CONFIG_ENVCGI_DIRECTORY)
             setenv (CONFIG_ENVCGI_DIRECTORY, temp, 1);
+#endif
 #ifdef	CONFIG_ENV_DB_FROM_URL
          if (*u == '/')
             u++;
@@ -831,8 +837,10 @@ main (int argc, char *argv[])
          while (*q && *q != '/')
             q++;
          *q = 0;
+#ifdef	CONFIG_ENV_DB
          if (*CONFIG_ENV_DB)
             setenv (CONFIG_ENV_DB, u, 1);
+#endif
 #else
          if (*CONFIG_ENV_DB && *CONFIG_DB_DATABASE)
             setenv (CONFIG_ENV_DB, CONFIG_DB_DATABASE, 1);
@@ -840,14 +848,18 @@ main (int argc, char *argv[])
          if (!post)
          {
             q = getenv ("QUERY_STRING");
+#ifdef	CONFIG_ENVCGI_QUERY
             if (q && *CONFIG_ENVCGI_QUERY)
                setenv (CONFIG_ENVCGI_QUERY, q, 1);
+#endif
          }
       }
    }
 
+#ifdef	CONFIG_CGI_PATH
    if (*CONFIG_CGI_PATH)
       setenv ("PATH", CONFIG_CGI_PATH, 1);
+#endif
 
    while (e)
    {                            // Store environment
