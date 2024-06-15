@@ -150,6 +150,9 @@ password (int min, int max, int entropy)
 #ifndef	CONFIG_PASSWORD_MAX
 #define	CONFIG_PASSWORD_MAX	32
 #endif
+#ifndef	CONFIG_PASSWORD_ENTROPY
+#define	CONFIG_PASSWORD_ENTROPY	40
+#endif
 int
 main (int argc, const char *argv[])
 {
